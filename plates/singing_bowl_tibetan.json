@@ -1,0 +1,34 @@
+{
+  "name": "Singing Bowl — Tibetan Bronze",
+  "shape": "hemispherical_shell",
+  "outer_diameter_mm": 180,
+  "rim_diameter_mm": 178,
+  "height_mm": 80,
+  "wall_thickness_mm": 3.5,
+  "material": {
+    "name": "panchaloga_bronze",
+    "composition": {
+      "copper_pct": 70,
+      "tin_pct": 15,
+      "zinc_pct": 5,
+      "iron_pct": 5,
+      "lead_pct": 3,
+      "mercury_trace": true,
+      "gold_trace": true
+    },
+    "density_kg_m3": 8700,
+    "youngs_modulus_GPa": 110,
+    "damping_factor": 0.003
+  },
+  "boundary": "free_rim",
+  "drive_method": "mallet_rim_stroke",
+  "fundamental_hz": 226,
+  "modes": [
+    { "n": 2, "freq_hz": 226,  "name": "Quadrupole",  "sacred": "Foundation tone" },
+    { "n": 3, "freq_hz": 452,  "name": "Sextupole",   "sacred": "Octave harmonic" },
+    { "n": 4, "freq_hz": 810,  "name": "Octupole",    "sacred": "Third harmonic" },
+    { "n": 5, "freq_hz": 1260, "name": "Decapole",    "sacred": "Fifth harmonic" }
+  ],
+  "water_fill_pct": 50,
+  "notes": "When half-filled with water and driven at the rim, surface forms standing Faraday-like patterns. At 226 Hz the 4-noded (n=2) mode dominates — four fountains erupt at antinodes."
+}

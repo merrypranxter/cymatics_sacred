@@ -1,0 +1,31 @@
+{
+  "name": "Hal Saflieni Hypogeum — Main Chamber",
+  "location": "Paola, Malta",
+  "date_bce": -3600,
+  "geometry": {
+    "shape": "ellipsoidal_cavity",
+    "length_m": 8.5,
+    "width_m": 5.0,
+    "height_m": 4.0,
+    "volume_m3": 178,
+    "surface": "limestone_carved"
+  },
+  "acoustics": {
+    "fundamental_resonance_hz": 110,
+    "description": "The chamber resonates strongly at 110 Hz — the low male chant frequency. Standing waves reinforce at this frequency with a measured RT60 of ~8 seconds.",
+    "effect_on_occupants": "At 110 Hz, the acoustic resonance shifts brain activity from left-hemisphere (language, logic) to right-hemisphere (ritual, spatial). Measured EEG effects reported by multiple researchers.",
+    "infrasound_hz": [18, 19],
+    "notes": "The 'Oracle Chamber' has a carved aperture that focuses 110 Hz into the main hall. Infrasound at 18-19 Hz creates dread and visual phenomena."
+  },
+  "standing_wave_nodes": [
+    { "position": "center",         "type": "pressure_antinode", "loudness_db": "+12 above average" },
+    { "position": "quarter_length", "type": "pressure_node",     "loudness_db": "null" },
+    { "position": "corners",        "type": "pressure_antinode", "loudness_db": "+9 above average" }
+  ],
+  "drive_frequencies_hz": [110, 220, 55],
+  "references": [
+    "Cook, I.A. et al. (2008). Ancient acoustic resonance and the brain. Time and Mind.",
+    "Reznikoff, I. (2002). Palaeolithic cave art and acoustic resonance. JASA.",
+    "Lubman, D. (2002). Ancient acoustic spaces. JASA."
+  ]
+}

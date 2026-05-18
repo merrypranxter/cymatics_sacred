@@ -1,0 +1,23 @@
+{
+  "name": "Water — Distilled",
+  "type": "fluid",
+  "use_case": "Faraday waves, singing bowl surface, Cymascope",
+  "density_kg_m3": 998,
+  "surface_tension_N_m": 0.0728,
+  "kinematic_viscosity_m2_s": 1.004e-6,
+  "speed_of_sound_m_s": 1482,
+  "capillary_length_mm": 2.7,
+  "behavior": {
+    "faraday_threshold": "Vertical forcing amplitude above threshold (depends on depth and frequency) causes subharmonic standing waves on the surface.",
+    "dispersion_relation": "ω² = (gk + σk³/ρ) · tanh(kd) where k=wavenumber, d=depth, σ=surface tension",
+    "hexagonal_mode_condition": "Occurs at specific (depth/wavelength) ratios, typically d/λ ≈ 0.3-0.5",
+    "cymascope_note": "Add a drop of dish soap to reduce surface tension and reveal finer detail; adds 2D Marangoni flow that can alter pattern symmetry"
+  },
+  "depth_presets_mm": {
+    "shallow_hexagonal": 3,
+    "medium_radial": 8,
+    "deep_bulk": 20
+  },
+  "color_hex": "#4A7FA5",
+  "notes": "Temperature matters: at 20°C vs 10°C surface tension changes ~4%, shifting hexagonal instability threshold by ~8 Hz."
+}
