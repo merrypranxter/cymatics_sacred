@@ -1,0 +1,18 @@
+{
+  "name": "Lycopodium Powder",
+  "type": "granular_fine",
+  "use_case": "Chladni circular plates, fine-detail nodal mapping",
+  "particle_size_um": { "min": 25, "max": 35, "median": 30 },
+  "density_kg_m3": 1050,
+  "hydrophobic": true,
+  "notes_on_hydrophobia": "Floats on water; useful for water-surface Cymascope work to trace antinodes (opposite of sand on plates).",
+  "behavior": {
+    "migration_on_plate": "nodes (same as sand, but finer resolution)",
+    "migration_on_water_surface": "antinodes (floats at crests due to hydrophobia)",
+    "visible_threshold_hz": 40,
+    "pattern_clarity": "excellent above 500 Hz where sand becomes too coarse"
+  },
+  "color_hex": "#F5F0D8",
+  "safety": "Combustible dust; avoid open flame. Respiratory irritant; use in ventilated area.",
+  "sources": ["Botanical supply", "Scientific suppliers: Sigma-Aldrich #L4761"]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Chladni Circular Plate — 432 Hz",
+  "shape": "circular",
+  "diameter_mm": 300,
+  "thickness_mm": 1.0,
+  "material": {
+    "name": "steel",
+    "density_kg_m3": 7850,
+    "youngs_modulus_GPa": 200,
+    "poisson_ratio": 0.30,
+    "speed_of_sound_m_s": 5050
+  },
+  "boundary": "clamped_center",
+  "drive_point": "center",
+  "fundamental_hz": 432,
+  "modes": [
+    { "m": 0, "n": 1, "freq_hz": 432,  "name": "Bullseye",       "sacred": "Unison, the whole" },
+    { "m": 1, "n": 1, "freq_hz": 648,  "name": "Yin-Yang",       "sacred": "Duality, perfect fifth" },
+    { "m": 0, "n": 2, "freq_hz": 972,  "name": "Two rings",      "sacred": "Nested circles" },
+    { "m": 2, "n": 1, "freq_hz": 1080, "name": "Triskelion",     "sacred": "Triple spiral" },
+    { "m": 3, "n": 1, "freq_hz": 1296, "name": "Four-leaf",      "sacred": "Four directions" },
+    { "m": 4, "n": 1, "freq_hz": 1512, "name": "Pentagram",      "sacred": "Golden ratio" },
+    { "m": 5, "n": 1, "freq_hz": 1728, "name": "Hexagram",       "sacred": "Star of David, Metatron" },
+    { "m": 6, "n": 1, "freq_hz": 1944, "name": "Heptagram",      "sacred": "Seven planets" }
+  ],
+  "medium": "lycopodium_powder",
+  "notes": "Bessel modes (m=nodal diameters, n=nodal circles). Lycopodium powder used for finer resolution than sand."
+}

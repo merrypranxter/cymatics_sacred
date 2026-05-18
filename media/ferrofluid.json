@@ -1,0 +1,17 @@
+{
+  "name": "Ferrofluid",
+  "type": "magnetic_colloid",
+  "use_case": "Magnetically-driven Rosensweig instability; spike patterns from standing field waves",
+  "composition": "Iron oxide nanoparticles (Fe₃O₄, 10 nm) in carrier oil + surfactant",
+  "particle_size_nm": 10,
+  "density_kg_m3": 1200,
+  "surface_tension_N_m": 0.026,
+  "magnetic_permeability_relative": 3.5,
+  "behavior": {
+    "rosensweig_instability": "Above a critical magnetic field strength, the flat surface becomes unstable and forms a hexagonal array of sharp spikes — the Rosensweig (or normal-field) instability.",
+    "cymatic_coupling": "Modulating the magnetic field at audio frequencies drives Faraday-like standing waves with spike arrays following nodal geometry.",
+    "pattern_type": "hexagonal by default; can be driven to square or stripe phases with anisotropic field geometry"
+  },
+  "color_hex": "#1A1210",
+  "notes": "Ferrofluid is a sacred-geometry goldmine: combine acoustic driving with static magnetic bias field and the spikes form 3D standing-wave sculptures."
+}

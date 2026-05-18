@@ -1,0 +1,18 @@
+{
+  "name": "Sand — Crushed White Quartz",
+  "type": "granular",
+  "use_case": "Chladni plate, square and circular",
+  "particle_size_um": { "min": 150, "max": 600, "median": 300 },
+  "density_kg_m3": 2650,
+  "angle_of_repose_deg": 34,
+  "coefficient_of_restitution": 0.3,
+  "friction_coefficient": 0.55,
+  "behavior": {
+    "migration": "antinodes_to_nodes",
+    "reason": "In the vibrating-plate regime the time-averaged force on a granule is directed toward displacement nodes (minima of amplitude). Lighter particles move faster.",
+    "visible_threshold_hz": 50,
+    "pattern_clarity": "best between 100-2000 Hz at amplitudes 0.1-1 mm"
+  },
+  "color_hex": "#EAE5D8",
+  "notes": "Fine quartz gives best resolution. Coarser sand shows mode shapes at lower frequencies. Lycopodium powder (see media/lycopodium.json) shows finer features."
+}

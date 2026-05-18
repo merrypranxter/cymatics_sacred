@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cymatics_sacred — shader viewer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0808;
+      color: #c8b890;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid #2a2010;
+      width: 100%;
+    }
+    header h1 { font-size: 1.2rem; letter-spacing: 0.2em; color: #d4a44c; }
+    header p  { font-size: 0.75rem; color: #7a6840; margin-top: 0.25rem; }
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      justify-content: center;
+      border-bottom: 1px solid #2a2010;
+      width: 100%;
+    }
+    button {
+      background: #1a1208;
+      border: 1px solid #4a3820;
+      color: #c8b890;
+      padding: 0.35rem 0.85rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    button:hover   { background: #2a2010; border-color: #d4a44c; }
+    button.active  { background: #2a1800; border-color: #d4a44c; color: #e8c870; }
+    #freq-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+    }
+    #freq-row input[type=range] { accent-color: #d4a44c; width: 140px; }
+    #freq-display { min-width: 3.5em; text-align: right; color: #d4a44c; }
+    #canvas-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    canvas {
+      display: block;
+      max-width: 700px;
+      max-height: 700px;
+      width: min(90vw, 90vh);
+      height: min(90vw, 90vh);
+      border: 1px solid #2a2010;
+    }
+    #info {
+      padding: 0.5rem 1rem;
+      font-size: 0.7rem;
+      color: #6a5830;
+      text-align: center;
+    }
+    #error {
+      color: #c04040;
+      padding: 1rem;
+      white-space: pre;
+      font-size: 0.75rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>cymatics_sacred</h1>
+  <p>the geometry is not chosen — it is revealed by the vibration</p>
+</header>
+
+<div id="controls">
+  <button class="shader-btn active" data-shader="chladni_square">chladni square</button>
+  <button class="shader-btn" data-shader="faraday_hex">faraday hex</button>
+  <button class="shader-btn" data-shader="singing_bowl">singing bowl</button>
+  <button class="shader-btn" data-shader="temple_resonance">temple resonance</button>
+  <span id="freq-row">
+    <label for="freq-slider">freq</label>
+    <input type="range" id="freq-slider" min="30" max="500" value="110" step="1" />
+    <span id="freq-display">110 Hz</span>
+  </span>
+  <button id="pause-btn">pause</button>
+</div>
+
+<div id="canvas-wrap">
+  <canvas id="glcanvas"></canvas>
+  <pre id="error"></pre>
+</div>
+<div id="info" id="shader-info"></div>
+
+<script>
+// ─── Shader sources ────────────────────────────────────────────────────────
+
+const VERT = `
+attribute vec2 a_position;
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+
+// Minimal passthrough for shaders that live in external .frag files.
+// We inline them here so the viewer is a single self-contained HTML file.
+
+const SHADERS = {};
+
+SHADERS.chladni_square = `
+precision highp float;
+uniform vec2 u_resolution;
+uniform float u_time;
+#define PI 3.14159265
+#define TAU 6.28318530
+float chladni_mode(vec2 p, float m, float n) {
+  vec2 uv = p * 2.0 - 1.0;
+  float Xm = cos(m * PI * uv.x * 0.5) * cos(PI * uv.x * 0.5);
+  float Yn = cos(n * PI * uv.y * 0.5) * cos(PI * uv.y * 0.5);
+  float mode = Xm * Yn;
+  float mode_anti = sin(m * PI * uv.x * 0.5) * sin(n * PI * uv.y * 0.5);
+  return abs(mode) + abs(mode_anti) * 0.3;
+}
+float sand_accumulation(vec2 p, float mode_val) {
+  float node_strength = 1.0 - smoothstep(0.0, 0.15, mode_val);
+  float grain = fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+  node_strength *= 0.8 + 0.2 * grain;
+  return node_strength;
+}
+float multi_mode(vec2 p, float time) {
+  float mode = chladni_mode(p, 2.0, 2.0);
+  mode += chladni_mode(p, 3.0, 2.0) * 0.5 * sin(time * 0.7);
+  mode += chladni_mode(p, 2.0, 3.0) * 0.3 * sin(time * 1.1);
+  mode += chladni_mode(p, 3.0, 3.0) * 0.2;
+  mode += chladni_mode(p, 4.0, 2.0) * 0.15;
+  mode += chladni_mode(p, 2.0, 4.0) * 0.1;
+  return mode;
+}
+void main() {
+  vec2 st = gl_FragCoord.xy / u_resolution.xy;
+  st.x *= u_resolution.x / u_resolution.y;
+  float plate_mask = 1.0 - smoothstep(0.45, 0.5, max(abs(st.x - 0.5), abs(st.y - 0.5) * u_resolution.y / u_resolution.x));
+  vec3 col = vec3(0.08, 0.06, 0.04);
+  if (plate_mask > 0.01) {
+    float mode = multi_mode(st, u_time);
+    float sand = sand_accumulation(st, mode);
+    vec3 brass = vec3(0.72, 0.55, 0.28);
+    vec3 sand_col = vec3(0.92, 0.90, 0.85);
+    vec3 plate_col = mix(brass, sand_col, sand * 0.9);
+    plate_col *= 1.0 - mode * 0.05;
+    float edge = smoothstep(0.35, 0.45, max(abs(st.x - 0.5), abs(st.y - 0.5) * u_resolution.y / u_resolution.x));
+    plate_col += vec3(0.1, 0.08, 0.05) * edge;
+    plate_col += vec3(0.05, 0.0, 0.0) * smoothstep(0.6, 1.0, mode);
+    col = mix(col, plate_col, plate_mask);
+  }
+  col *= 1.0 - smoothstep(0.5, 1.5, length(st - 0.5));
+  float grain = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+  col *= 0.96 + 0.04 * grain;
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+SHADERS.faraday_hex = `
+precision highp float;
+uniform vec2 u_resolution;
+uniform float u_time;
+#define PI 3.14159265
+#define TAU 6.28318530
+float faraday_wave(vec2 p, float time, float freq, float depth) {
+  vec2 uv = p * 2.0 - 1.0;
+  float r = length(uv);
+  float angle = atan(uv.y, uv.x);
+  float radial    = sin(r * freq * PI) * exp(-r * r * 0.5);
+  float azimuthal = cos(angle * 6.0) * 0.5 + 0.5;
+  float temporal  = sin(time * freq * 0.5) * 0.5 + 0.5;
+  float damping   = exp(-depth * r);
+  return radial * azimuthal * temporal * damping;
+}
+float water_height(vec2 p, float time) {
+  float h = 0.0;
+  h += faraday_wave(p, time, 3.0, 0.5) * 0.4;
+  h += faraday_wave(p, time * 1.5 + 1.0, 5.0, 0.3) * 0.2;
+  h += faraday_wave(p, time * 0.7 + 2.0, 7.0, 0.2) * 0.1;
+  float sub = sin(time * 0.25) * 0.5 + 0.5;
+  h += faraday_wave(p, time * 0.5, 4.0, 0.4) * sub * 0.3;
+  return h;
+}
+vec3 water_color(vec2 p, float height, float time) {
+  vec3 deep    = vec3(0.05, 0.15, 0.25);
+  vec3 shallow = vec3(0.2,  0.4,  0.5);
+  vec3 crest   = vec3(0.6,  0.75, 0.8);
+  vec3 col     = mix(deep, shallow, 0.5 + height * 0.5);
+  col = mix(col, crest, smoothstep(0.3, 0.5, height));
+  vec2 cuv = p * 3.0 + vec2(time * 0.1);
+  float caustic = pow(abs(sin(cuv.x * 10.0) * sin(cuv.y * 10.0)), 2.0);
+  col += vec3(0.3, 0.4, 0.3) * caustic * smoothstep(0.3, 0.5, height);
+  vec2 uv = p * 2.0 - 1.0;
+  col += vec3(0.4, 0.5, 0.6) * smoothstep(0.85, 0.95, length(uv)) * 0.3;
+  return col;
+}
+void main() {
+  vec2 st = gl_FragCoord.xy / u_resolution.xy;
+  st.x *= u_resolution.x / u_resolution.y;
+  vec2 uv = st * 2.0 - 1.0;
+  float r = length(uv);
+  float vessel_mask = 1.0 - smoothstep(0.85, 0.95, r);
+  vec3 col = vec3(0.1, 0.08, 0.06);
+  if (vessel_mask > 0.01) {
+    float height = water_height(st, u_time);
+    vec3  water  = water_color(st, height, u_time);
+    float interior = smoothstep(0.8, 0.85, r);
+    col = mix(vec3(0.4, 0.35, 0.3), water, vessel_mask);
+    col += vec3(0.3, 0.25, 0.2) * smoothstep(0.88, 0.9, r) * (1.0 - smoothstep(0.92, 0.95, r));
+  }
+  col *= 1.0 - smoothstep(0.5, 1.2, length(st - 0.5));
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+SHADERS.singing_bowl = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+#define PI  3.14159265
+#define TAU 6.28318530
+float bowl_mode(vec2 p, float n, float phase) {
+  vec2 uv  = p * 2.0 - 1.0;
+  float r  = length(uv);
+  float th = atan(uv.y, uv.x);
+  float rim_pattern = cos(n * th + phase);
+  float radial = sin(r * PI) * exp(-r * r * 0.2);
+  return rim_pattern * radial;
+}
+float water_surface(vec2 p, float time) {
+  float h = 0.0;
+  h += bowl_mode(p, 2.0, time * 1.0) * 0.5;
+  h += bowl_mode(p, 3.0, time * 2.0 + PI * 0.3) * 0.25;
+  h += bowl_mode(p, 4.0, time * 3.7 + PI * 0.7) * 0.12;
+  h += bowl_mode(p, 5.0, time * 5.8) * 0.06;
+  return h;
+}
+float water_jet(vec2 p, float n, float time) {
+  vec2 uv  = p * 2.0 - 1.0;
+  float r  = length(uv);
+  float th = atan(uv.y, uv.x);
+  float jet_mask = smoothstep(0.75, 1.0, abs(sin(n * th)));
+  float rim_zone = smoothstep(0.60, 0.72, r) * (1.0 - smoothstep(0.78, 0.88, r));
+  float pulse    = pow(abs(sin(time * 1.0)), 3.0);
+  return jet_mask * rim_zone * pulse;
+}
+vec3 bowl_metal(vec2 p) {
+  vec2 uv = p * 2.0 - 1.0;
+  float r  = length(uv);
+  float th = atan(uv.y, uv.x);
+  vec3 bronze = vec3(0.55, 0.38, 0.18);
+  vec3 patina = vec3(0.22, 0.38, 0.26);
+  float ox = smoothstep(0.55, 0.85, r) * (0.5 + 0.5 * sin(th * 7.0 + r * 12.0));
+  vec3 metal = mix(bronze, patina, ox * 0.4);
+  float hammer = fract(sin(dot(uv * 8.0, vec2(127.1, 311.7))) * 43758.5);
+  metal *= 0.85 + 0.15 * hammer;
+  metal += vec3(0.7, 0.55, 0.3) * smoothstep(0.72, 0.80, r) * (1.0 - smoothstep(0.84, 0.90, r)) * 0.6;
+  return metal;
+}
+void main() {
+  vec2 st = gl_FragCoord.xy / u_resolution.xy;
+  st.x *= u_resolution.x / u_resolution.y;
+  vec2 uv = st * 2.0 - 1.0;
+  float r = length(uv);
+  float bowl_mask  = 1.0 - smoothstep(0.88, 0.96, r);
+  float water_mask = 1.0 - smoothstep(0.74, 0.80, r);
+  vec3 col = vec3(0.06, 0.05, 0.04);
+  if (bowl_mask > 0.01) {
+    col = mix(col, bowl_metal(st), bowl_mask);
+    if (water_mask > 0.01) {
+      float h = water_surface(st, u_time);
+      vec3 deep  = vec3(0.04, 0.12, 0.20);
+      vec3 mid   = vec3(0.15, 0.32, 0.45);
+      vec3 crest = vec3(0.70, 0.80, 0.90);
+      vec3 water = mix(deep, mid, clamp(0.5 + h * 0.6, 0.0, 1.0));
+      water = mix(water, crest, smoothstep(0.25, 0.50, h) * 0.6);
+      vec2 cuv = st * 5.0;
+      float cx = pow(abs(sin(cuv.x * 8.0 + u_time * 1.2) * sin(cuv.y * 9.0 - u_time * 0.8)), 2.5);
+      water += vec3(0.25, 0.35, 0.25) * cx * smoothstep(0.25, 0.50, h) * 0.4;
+      water = mix(water, vec3(0.85, 0.92, 0.98), water_jet(st, 2.0, u_time) * 0.8);
+      water = mix(water, vec3(0.68, 0.74, 0.79), water_jet(st, 3.0, u_time * 1.95 + 0.4) * 0.35);
+      col = mix(col, water, water_mask * 0.95);
+    }
+  }
+  float pulse = 0.5 + 0.5 * sin(u_time * 0.9);
+  col += vec3(0.15, 0.08, 0.03) * (1.0 - smoothstep(0.88, 1.4, r)) * pulse * 0.12;
+  col *= 1.0 - smoothstep(0.4, 1.3, r);
+  float grain = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+  col *= 0.97 + 0.03 * grain;
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+SHADERS.temple_resonance = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+uniform float u_freq;
+#define PI  3.14159265
+#define TAU 6.28318530
+float room_mode(vec2 p, float m, float n, float Lx, float Ly, float time, float freq) {
+  float kx = m * PI / Lx;
+  float ky = n * PI / Ly;
+  return cos(kx * p.x) * cos(ky * p.y) * sin(TAU * freq * time);
+}
+float chamber_pressure(vec2 p, float time, float freq) {
+  float Lx = 1.0;
+  float Ly = 5.0 / 8.5;
+  float pr = 0.0;
+  pr += room_mode(p, 3.0, 0.0, Lx, Ly, time, freq) / (1.0 + pow((freq-110.0)/8.0,2.0));
+  pr += room_mode(p, 0.0, 2.0, Lx, Ly, time, freq) / (1.0 + pow((freq-137.0)/8.0,2.0)) * 0.5;
+  pr += room_mode(p, 3.0, 1.0, Lx, Ly, time, freq) / (1.0 + pow((freq-144.0)/8.0,2.0)) * 0.4;
+  pr += room_mode(p, 4.0, 0.0, Lx, Ly, time, freq) / (1.0 + pow((freq-160.0)/8.0,2.0)) * 0.3;
+  pr += sin(TAU * 18.5 * time) * 0.18 * exp(-4.0 * pow(p.x - 0.5, 2.0));
+  return pr;
+}
+float oracle_aperture(vec2 p) {
+  vec2 ap = vec2(0.22, 0.5);
+  float beam_angle = atan(p.y - ap.y, p.x - ap.x);
+  return exp(-pow(beam_angle, 2.0) * 8.0) * exp(-length(p - ap) * 3.0);
+}
+vec3 stone_texture(vec2 p) {
+  float g = 0.6 + 0.15 * fract(sin(dot(p*40.0,vec2(127.1,311.7)))*43758.5)
+              + 0.08 * fract(sin(dot(p*12.0,vec2(269.5,183.3)))*43758.5);
+  return vec3(0.65, 0.60, 0.52) * g;
+}
+void main() {
+  vec2 st = gl_FragCoord.xy / u_resolution.xy;
+  float aspect = u_resolution.x / u_resolution.y;
+  vec2 p = vec2(st.x * aspect, st.y) / vec2(8.5/5.0, 1.0);
+  float freq = (u_freq > 0.0) ? u_freq : 110.0;
+  float margin = 0.04;
+  bool in_chamber = (p.x > margin && p.x < 1.0-margin && p.y > margin && p.y < 1.0-margin);
+  vec3 col = stone_texture(st) * 0.3;
+  if (in_chamber) {
+    float pr = chamber_pressure(p, u_time, freq);
+    float ap = oracle_aperture(p);
+    vec3 antiP = vec3(0.85, 0.30, 0.10);
+    vec3 antiN = vec3(0.15, 0.12, 0.55);
+    vec3 nCol  = vec3(0.06, 0.05, 0.07);
+    vec3 pcol  = nCol;
+    pcol = mix(pcol, antiP, smoothstep(0.0, 0.6, max(0.0, pr)) * 0.85);
+    pcol = mix(pcol, antiN, smoothstep(0.0, 0.6, max(0.0, -pr)) * 0.7);
+    pcol = mix(pcol, vec3(0.90, 0.72, 0.20), ap * 0.65);
+    vec3 stone = stone_texture(p) * vec3(0.55, 0.50, 0.42);
+    col = mix(stone, pcol, 0.78);
+    float pill = max(max(smoothstep(0.03,0.0,length(p-vec2(0.15,0.18))),
+                         smoothstep(0.03,0.0,length(p-vec2(0.15,0.82)))),
+                    max(smoothstep(0.03,0.0,length(p-vec2(0.85,0.18))),
+                         smoothstep(0.03,0.0,length(p-vec2(0.85,0.82)))));
+    col = mix(col, stone_texture(p) * vec3(0.72,0.66,0.58), pill);
+    float doors = max(smoothstep(0.015,0.0,length(p-vec2(0.25,0.5))),
+                      smoothstep(0.015,0.0,length(p-vec2(0.75,0.5))));
+    col = mix(col, vec3(0.08,0.08,0.12), doors * 0.8);
+  }
+  col *= 1.0 - smoothstep(0.3, 0.85, length(st - 0.5));
+  float grain = fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  col *= 0.96 + 0.04 * grain;
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+const SHADER_INFO = {
+  chladni_square:   'Square brass plate · 432 Hz · sand at nodal lines · (m,n) Chladni modes',
+  faraday_hex:      'Water surface · vertical forcing · subharmonic instability · hexagonal tessellation',
+  singing_bowl:     'Tibetan bronze bowl · n=2..5 shell modes · water fountains at antinodes',
+  temple_resonance: 'Hal Saflieni Hypogeum · 110 Hz standing wave · oracle aperture · adjust freq slider'
+};
+
+// ─── WebGL bootstrap ──────────────────────────────────────────────────────
+
+const canvas  = document.getElementById('glcanvas');
+const gl      = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+const errBox  = document.getElementById('error');
+const infoBox = document.getElementById('info');
+
+if (!gl) {
+  errBox.style.display = 'block';
+  errBox.textContent = 'WebGL not available in this browser.';
+}
+
+let currentShader = 'chladni_square';
+let paused        = false;
+let startTime     = performance.now();
+let pauseTime     = 0;
+let freq          = 110.0;
+
+function compileShader(src, type) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    throw new Error(gl.getShaderInfoLog(s));
+  }
+  return s;
+}
+
+function buildProgram(fragSrc) {
+  const vert = compileShader(VERT, gl.VERTEX_SHADER);
+  const frag = compileShader(fragSrc, gl.FRAGMENT_SHADER);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vert);
+  gl.attachShader(prog, frag);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    throw new Error(gl.getProgramInfoLog(prog));
+  }
+  return prog;
+}
+
+const quad = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
+const buf  = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+
+let prog = null;
+
+function switchShader(name) {
+  try {
+    const newProg = buildProgram(SHADERS[name]);
+    if (prog) gl.deleteProgram(prog);
+    prog = newProg;
+    currentShader = name;
+    errBox.style.display = 'none';
+    infoBox.textContent = SHADER_INFO[name] || '';
+  } catch (e) {
+    errBox.style.display = 'block';
+    errBox.textContent = e.message;
+  }
+}
+
+switchShader(currentShader);
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  const s   = Math.min(canvas.clientWidth, canvas.clientHeight);
+  canvas.width  = s * dpr;
+  canvas.height = s * dpr;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function render() {
+  resize();
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.useProgram(prog);
+
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+  const uRes  = gl.getUniformLocation(prog, 'u_resolution');
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uFreq = gl.getUniformLocation(prog, 'u_freq');
+
+  const elapsed = paused ? pauseTime : (performance.now() - startTime) / 1000;
+
+  gl.uniform2f(uRes,  canvas.width, canvas.height);
+  gl.uniform1f(uTime, elapsed);
+  gl.uniform1f(uFreq, freq);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  requestAnimationFrame(render);
+}
+
+render();
+
+// ─── Controls ─────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.shader-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.shader-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    switchShader(btn.dataset.shader);
+  });
+});
+
+document.getElementById('pause-btn').addEventListener('click', function() {
+  paused = !paused;
+  if (paused) {
+    pauseTime = (performance.now() - startTime) / 1000;
+    this.textContent = 'resume';
+  } else {
+    startTime = performance.now() - pauseTime * 1000;
+    this.textContent = 'pause';
+  }
+});
+
+const freqSlider  = document.getElementById('freq-slider');
+const freqDisplay = document.getElementById('freq-display');
+freqSlider.addEventListener('input', () => {
+  freq = parseFloat(freqSlider.value);
+  freqDisplay.textContent = freq + ' Hz';
+});
+</script>
+</body>
+</html>
