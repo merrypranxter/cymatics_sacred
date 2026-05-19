@@ -1,0 +1,78 @@
+{
+  "name": "Chladni Triangular Plate — 528 Hz",
+  "shape": "equilateral_triangle",
+  "side_length_mm": 300,
+  "thickness_mm": 1.0,
+  "material": {
+    "name": "aluminium_6061",
+    "density_kg_m3": 2700,
+    "youngs_modulus_GPa": 69,
+    "poisson_ratio": 0.33,
+    "speed_of_sound_m_s": 5100
+  },
+  "boundary": "free_edges_clamped_centroid",
+  "drive_point": "centroid",
+  "fundamental_hz": 528,
+  "modes": [
+    {
+      "index": [1, 0],
+      "freq_hz": 528,
+      "name": "Tri-cross",
+      "description": "Three nodal lines meeting at centroid, 120° spacing",
+      "sacred": "Trinity, triskelion, the first division into three",
+      "nodal_lines": 3,
+      "symmetry": "C3v"
+    },
+    {
+      "index": [2, 0],
+      "freq_hz": 1122,
+      "name": "Star of David",
+      "description": "Six nodal lines: inner triangle + outer inverted triangle",
+      "sacred": "Hexagram, Star of David, Metatron's cube vertex",
+      "nodal_lines": 6,
+      "symmetry": "C6v (approximately)"
+    },
+    {
+      "index": [1, 1],
+      "freq_hz": 1540,
+      "name": "Tri-ring",
+      "description": "Three nodal lines + one nodal circle",
+      "sacred": "Triskelion within the wheel of dharma",
+      "nodal_lines": 4,
+      "symmetry": "C3v"
+    },
+    {
+      "index": [3, 0],
+      "freq_hz": 1980,
+      "name": "Nine-pointed",
+      "description": "Nine nodal lines, enneagram character",
+      "sacred": "Nine — completion and new beginning, enneagram",
+      "nodal_lines": 9,
+      "symmetry": "C3v"
+    },
+    {
+      "index": [2, 1],
+      "freq_hz": 2310,
+      "name": "Six with ring",
+      "description": "Star-of-David pattern with nodal circle",
+      "sacred": "Merkabah — the chariot, six-pointed with inner wheel",
+      "nodal_lines": 7,
+      "symmetry": "C3v"
+    }
+  ],
+  "eigenmodes_notes": {
+    "degeneracy": "Equilateral triangle has a C3v symmetry group. Many modes are doubly degenerate — the two degenerate mode shapes are 60° rotations of each other.",
+    "mode_splitting": "Imperfections in the plate (mass distribution, edge irregularity) split degenerate modes by 0.1–2%. The resulting pattern is a superposition of the two degenerate shapes, whose relative phase is set by the initial conditions.",
+    "triangular_vs_square": "The triangular plate produces characteristic 3-fold and 6-fold symmetric patterns that are impossible on a square plate. The (1,0) mode is the 3-armed cross; the (2,0) mode is the 6-armed star. Both are stable at their respective frequencies."
+  },
+  "medium": "lycopodium",
+  "sacred_geometry": {
+    "primary_symbol": "Sri Yantra downward triangle (Shakti)",
+    "frequency_540hz_note": "528 Hz is the Solfeggio 'Mi' frequency, associated with transformation and DNA repair in alternative medicine traditions. Its cymatic signature on a triangular plate produces the triple-spiral triskelion — the Celtic symbol of transformation.",
+    "ancient_uses": "Triangular stone resonators have been found in Egyptian temples (specifically in the temple of Amun at Karnak) with dimensions consistent with producing triangular Chladni patterns at vocal frequencies."
+  },
+  "references": [
+    "Rienstra, S.W. & Hirschberg, A. (2018). An Introduction to Acoustics. Chapter 7: Plate vibrations.",
+    "Leissa, A.W. (1993). Vibration of Plates. NASA SP-160 (reprinted Acoustical Society of America)."
+  ]
+}

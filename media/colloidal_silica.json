@@ -1,0 +1,65 @@
+{
+  "name": "Colloidal Silica Suspension — CymaStar Medium",
+  "type": "colloidal_suspension",
+  "use_case": "High-resolution Cymascope imaging, fine-detail nodal mapping on water surfaces",
+  "composition": {
+    "silica_particle_size_nm": 200,
+    "silica_density_kg_m3": 2200,
+    "carrier": "distilled_water",
+    "volume_fraction_pct": 5,
+    "stabilisation": "electrostatically_stabilised",
+    "commercial_examples": ["Ludox TM-50 (Sigma-Aldrich)", "Snowtex (Nissan Chemical)", "CymaStar (John Stuart Reid proprietary)"]
+  },
+  "optical_properties": {
+    "scattering_character": "Mie scattering (particle size comparable to visible light wavelength)",
+    "appearance": "Translucent white to opalescent; glows when illuminated from below (Tyndall effect)",
+    "nodal_line_visibility": "Excellent — the Tyndall scattering means nodal lines appear as bright bands against dark background when illuminated from below with a point source",
+    "color_hex": "#F5F0E8",
+    "resonance_glow": "At resonant frequencies, antinode regions show increased scattering from enhanced surface motion — a golden-white glow at the peaks"
+  },
+  "acoustic_behaviour": {
+    "migration_mode": "Depends on particle size relative to acoustic radiation force vs. surface tension",
+    "small_particles_lt_100nm": "Follow fluid motion; map the velocity field (not the pressure field)",
+    "medium_particles_100_500nm": "Partially affected by acoustic streaming; accumulate at convergence zones of streaming flows",
+    "large_particles_gt_1um": "Migrate to pressure nodes (like sand)",
+    "200nm_behaviour": "At 200 nm, the silica particles are predominantly carried by acoustic streaming. In Faraday wave conditions, streaming flows converge at nodal positions — so 200 nm silica appears at NODES (same as sand), but with much finer resolution.",
+    "optimal_frequency_hz": "100–2000 Hz for surface wave patterns; works well to 10 kHz for bulk acoustic patterns",
+    "pattern_lifetime_s": "Patterns persist for 5–30 seconds after driving stops; long enough for photography"
+  },
+  "dispersion_relation_effect": {
+    "modification_of_water": "At 5% volume fraction, the effective surface tension of the mixture is reduced by ~3%. This slightly shifts the hexagonal Faraday instability threshold downward by ~5 Hz.",
+    "viscosity_increase": "Effective viscosity approximately 1.08× that of pure water at 5% loading. This provides slight additional damping that smooths out noise and improves pattern clarity.",
+    "depth_independence": "Unlike sand (which builds up layers and changes depth), colloidal silica maintains constant depth — pattern reproducibility is much better."
+  },
+  "cymascope_protocol": {
+    "vessel": "Petri dish, 90 mm diameter, glass or ceramic",
+    "depth_mm": 4,
+    "illumination": "Single LED point source beneath transparent vessel; 530 nm (green) optimal for Tyndall scattering",
+    "camera": "Top-down; polarising filter reduces surface reflections",
+    "driving": "Function generator → amplifier → speaker cone; place Petri dish directly on speaker cone",
+    "optimal_amplitude": "Drive until first Faraday pattern appears, then reduce amplitude by 10% for stable long-exposure photography",
+    "photography": "1/4 to 1/2 second exposure at resonance; the pattern is phase-averaged and shows maximum clarity"
+  },
+  "preparation": {
+    "dilution": "Start with 30% commercial Ludox solution; dilute to 5% by volume with distilled water",
+    "stabilisation": "Adjust pH to 9–10 with 0.1 M NaOH if particles are agglomerating (the suspension should be clear, not cloudy with large aggregates)",
+    "storage": "Stable for months at room temperature; avoid freezing (irreversible aggregation)",
+    "cleaning": "Rinse with distilled water; avoid phosphate-based detergents which destabilise the suspension"
+  },
+  "comparison_with_other_media": {
+    "vs_water": "Much better pattern visibility; Tyndall glow makes nodes and antinodes clearly distinguishable",
+    "vs_sand": "10× higher resolution; can resolve sub-millimetre features that sand blurs",
+    "vs_lycopodium": "Works on water surface (lycopodium also works but is hydrophobic — floats awkwardly). Silica suspension is a true bulk medium.",
+    "vs_ferrofluid": "Silica needs no magnetic field. Ferrofluid is better for 3D patterns; silica is better for 2D nodal line photography."
+  },
+  "sacred_applications": {
+    "sri_yantra_imaging": "At specific frequencies (typically 136 Hz on circular vessels), the colloidal silica suspension develops patterns with 8-fold and 16-fold symmetry consistent with the lotus layers of the Sri Yantra. This has been photographed and published (Reid, 2006).",
+    "voice_imaging": "The CymaStar medium reveals the cymatic 'cymagram' of individual voices. Every vowel sound has a characteristic pattern. Two people speaking the same vowel produce similar but not identical patterns — the pattern encodes both the phoneme and the individual voice quality.",
+    "healing_frequency_visualization": "The Solfeggio frequencies (396, 417, 528, 639, 741, 852 Hz) are claimed to have specific healing properties. In colloidal silica at these frequencies, each Solfeggio tone produces a distinct geometric form that serves as a visual 'signature' of the frequency."
+  },
+  "sources": [
+    "Reid, J.S. & Stagliano, A. (2006). Cymascope imaging of the audible sound field. Journal of the British Homeopathic Association.",
+    "Crum, L.A. (1971). Acoustic force on a liquid droplet in an acoustic stationary wave. Journal of the Acoustical Society of America, 50(1B), 157–163.",
+    "Bohren, C.F. & Huffman, D.R. (1983). Absorption and Scattering of Light by Small Particles. Wiley-VCH."
+  ]
+}
