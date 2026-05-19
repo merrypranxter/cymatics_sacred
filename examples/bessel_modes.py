@@ -44,7 +44,9 @@ def plate_frequency(alpha_mn: float, R: float, h: float,
     """
     Natural frequency of circular plate mode (m, n).
 
-    f = (α²_mn · h) / (4π R² √(ρ/D))
+    f = (α²_mn / (2π R²)) · √(D / (ρ·h))
+
+    where D = E·h³ / (12·(1−ν²)) is the flexural rigidity.
 
     Parameters
     ----------
@@ -56,7 +58,7 @@ def plate_frequency(alpha_mn: float, R: float, h: float,
     nu       : float — Poisson's ratio
     """
     D = flexural_rigidity(E_Pa, h, nu)
-    return (alpha_mn**2 * h) / (4.0 * np.pi * R**2 * np.sqrt(rho / D))
+    return (alpha_mn**2 / (2.0 * np.pi * R**2)) * np.sqrt(D / (rho * h))
 
 
 def all_modes(n_m: int = 8, n_n: int = 4, **plate) -> list[dict]:
