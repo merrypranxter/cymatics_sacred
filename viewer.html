@@ -91,9 +91,15 @@
 
 <div id="controls">
   <button class="shader-btn active" data-shader="chladni_square">chladni square</button>
+  <button class="shader-btn" data-shader="chladni_circular">chladni circular</button>
   <button class="shader-btn" data-shader="faraday_hex">faraday hex</button>
   <button class="shader-btn" data-shader="singing_bowl">singing bowl</button>
+  <button class="shader-btn" data-shader="cymascope_water">cymascope water</button>
   <button class="shader-btn" data-shader="temple_resonance">temple resonance</button>
+  <button class="shader-btn" data-shader="ferrofluid">ferrofluid</button>
+  <button class="shader-btn" data-shader="lissajous_sand">lissajous sand</button>
+  <button class="shader-btn" data-shader="quasiperiodic">quasiperiodic</button>
+  <button class="shader-btn" data-shader="spherical_harmonics">spherical harmonics</button>
   <span id="freq-row">
     <label for="freq-slider">freq</label>
     <input type="range" id="freq-slider" min="30" max="500" value="110" step="1" />
@@ -375,11 +381,437 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }`;
 
+SHADERS.chladni_circular = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+#define PI   3.14159265
+#define TAU  6.28318530
+float J0(float x) {
+  if (x < 0.001) return 1.0;
+  if (x < 3.0) { float x2=x*x; return 1.0-x2/4.0+x2*x2/64.0-x2*x2*x2/2304.0+x2*x2*x2*x2/147456.0; }
+  return sqrt(2.0/(PI*x))*cos(x-PI*0.25);
+}
+float J1(float x) {
+  if (x < 0.001) return x*0.5;
+  if (x < 3.0) { float x2=x*x; return (x/2.0)*(1.0-x2/8.0+x2*x2/192.0-x2*x2*x2/9216.0); }
+  return sqrt(2.0/(PI*x))*cos(x-3.0*PI/4.0);
+}
+float J2(float x) {
+  if (x < 0.001) return x*x/8.0;
+  if (x < 3.0) { float x2=x*x; return x2/8.0*(1.0-x2/12.0+x2*x2/384.0); }
+  return sqrt(2.0/(PI*x))*cos(x-5.0*PI/4.0);
+}
+float J3(float x) {
+  if (x < 0.001) return x*x*x/48.0;
+  if (x < 3.0) { float x2=x*x; return x2*x/48.0*(1.0-x2/16.0+x2*x2/576.0); }
+  return sqrt(2.0/(PI*x))*cos(x-7.0*PI/4.0);
+}
+float J4(float x) {
+  if (x < 0.001) return x*x*x*x/384.0;
+  if (x < 3.0) { float x2=x*x; return x2*x2/384.0*(1.0-x2/20.0+x2*x2/800.0); }
+  return sqrt(2.0/(PI*x))*cos(x-9.0*PI/4.0);
+}
+float J5(float x) {
+  if (x < 0.001) return 0.0;
+  if (x < 3.0) { float x2=x*x; return x2*x2*x/3840.0*(1.0-x2/24.0); }
+  return sqrt(2.0/(PI*x))*cos(x-11.0*PI/4.0);
+}
+float bessel_jn(float n, float x) {
+  x = max(x, 0.0);
+  if      (n < 0.5) return J0(x);
+  else if (n < 1.5) return J1(x);
+  else if (n < 2.5) return J2(x);
+  else if (n < 3.5) return J3(x);
+  else if (n < 4.5) return J4(x);
+  else              return J5(x);
+}
+float bessel_mode(vec2 p, float m, float k) {
+  float r=length(p), th=atan(p.y,p.x);
+  return bessel_jn(m, k*r) * ((m < 0.5) ? 1.0 : cos(m*th));
+}
+float plate_field(vec2 p, float time) {
+  float w = 0.0;
+  w += bessel_mode(p, 0.0, 2.405*2.40) * 0.55;
+  w += bessel_mode(p, 2.0, 5.136*2.00) * 0.50*sin(time*0.55);
+  w += bessel_mode(p, 3.0, 6.380*1.78) * 0.40*sin(time*0.82+1.05);
+  w += bessel_mode(p, 4.0, 7.588*1.60) * 0.28*sin(time*1.18+2.09);
+  w += bessel_mode(p, 5.0, 8.772*1.46) * 0.20*sin(time*1.57+3.14);
+  w += bessel_mode(p, 0.0, 5.520*2.20) * 0.18*sin(time*0.38+0.60);
+  return w;
+}
+void main() {
+  vec2 st=gl_FragCoord.xy/u_resolution.xy;
+  float ar=u_resolution.x/u_resolution.y;
+  vec2 uv=(st*2.0-1.0)*vec2(ar,1.0);
+  float r=length(uv);
+  float pr=0.82;
+  float plate_mask=1.0-smoothstep(pr,pr+0.06,r);
+  float rim_mask=smoothstep(pr-0.04,pr,r)*(1.0-smoothstep(pr,pr+0.055,r));
+  vec3 col=vec3(0.05,0.04,0.06);
+  if (plate_mask > 0.01) {
+    float field=plate_field(uv/pr, u_time);
+    float node=1.0-smoothstep(0.0,0.10,abs(field));
+    float grain=fract(sin(dot(uv*95.0,vec2(127.1,311.7)))*43758.5453);
+    node*=0.80+0.20*grain;
+    float rb=fract(r*38.0+0.04*sin(atan(uv.y,uv.x)*14.0));
+    vec3 steel=vec3(0.58,0.59,0.62)*(0.88+0.12*rb);
+    vec3 lycop=vec3(0.95,0.92,0.74);
+    float anti=smoothstep(0.55,1.0,abs(field));
+    vec3 pc=mix(steel,lycop,node*0.92)+vec3(0.07,0.05,0.01)*anti;
+    pc=mix(pc,vec3(0.78,0.78,0.82),rim_mask*0.65);
+    col=mix(col,pc,plate_mask);
+  }
+  col=mix(col,vec3(0.65,0.50,0.22),1.0-smoothstep(0.020,0.038,r));
+  col*=1.0-smoothstep(0.72,1.5,r);
+  float fg=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  col*=0.97+0.03*fg;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+SHADERS.cymascope_water = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+uniform float u_freq;
+#define PI   3.14159265
+#define TAU  6.28318530
+#define PHI  1.61803399
+float radial_mode(vec2 p, float m_ang, float k, float t_phase, float th_phase) {
+  float r=length(p), th=atan(p.y,p.x);
+  float J; float x=k*r;
+  if (r < 0.01) { J=(m_ang < 0.5) ? 1.0 : 0.0; }
+  else { float asym=sqrt(2.0/(PI*max(x,0.5)))*cos(x-m_ang*PI*0.5-PI*0.25);
+         float near=1.0-x*x/4.0;
+         J=mix(near,asym,smoothstep(0.8,2.5,x)); }
+  float env=exp(-r*r*0.55);
+  float ang=(m_ang < 0.5) ? 1.0 : cos(m_ang*th+th_phase);
+  return J*env*ang*cos(t_phase);
+}
+float water_height(vec2 p, float time, float freq) {
+  float h=0.0; float k0=freq*0.012;
+  h+=radial_mode(p,0.0,k0,           time*freq*0.012,       0.0)*0.50;
+  h+=radial_mode(p,0.0,k0*2.0,       time*freq*0.024+1.0,   0.0)*0.22;
+  h+=radial_mode(p,2.0,k0*1.50,      time*freq*0.018+0.6,   time*0.20)*0.32;
+  h+=radial_mode(p,3.0,k0*2.00,      time*freq*0.024+1.2,   time*0.15)*0.22;
+  h+=radial_mode(p,4.0,k0*2.50,      time*freq*0.030+1.8,   time*0.10)*0.14;
+  h+=radial_mode(p,0.0,k0*PHI,       time*freq*0.012*PHI,   0.0)*0.10;
+  h+=radial_mode(p,0.0,k0*0.50,      time*freq*0.006,       0.0)*0.08;
+  return h;
+}
+void main() {
+  vec2 st=gl_FragCoord.xy/u_resolution.xy;
+  float ar=u_resolution.x/u_resolution.y;
+  vec2 uv=(st*2.0-1.0)*vec2(ar,1.0);
+  float r=length(uv);
+  float freq=(u_freq > 0.0) ? u_freq : 432.0;
+  float dr=0.86;
+  float dish_mask=1.0-smoothstep(dr,dr+0.07,r);
+  float rim_mask=smoothstep(dr-0.05,dr,r)*(1.0-smoothstep(dr,dr+0.06,r));
+  vec3 col=vec3(0.07,0.06,0.08);
+  if (dish_mask > 0.01) {
+    vec2 pn=uv/dr;
+    float h=water_height(pn,u_time,freq);
+    vec3 deep=vec3(0.03,0.10,0.24);
+    vec3 mid=vec3(0.10,0.27,0.48);
+    vec3 crest=vec3(0.62,0.80,0.92);
+    vec3 water=mix(deep,mid,clamp(0.42+h*0.72,0.0,1.0));
+    water=mix(water,crest,smoothstep(0.28,0.58,h));
+    float lyco=smoothstep(0.22,0.52,h);
+    float grain=fract(sin(dot(uv*88.0,vec2(127.1,311.7)))*43758.5453);
+    lyco*=0.70+0.30*grain;
+    water=mix(water,vec3(0.92,0.89,0.70),lyco*0.38);
+    float cancel=smoothstep(-0.12,0.0,h)*(1.0-smoothstep(0.0,0.12,h));
+    water=mix(water,deep*0.70,cancel*0.38);
+    col=mix(col,water,dish_mask);
+    col=mix(col,vec3(0.88,0.85,0.82),rim_mask*0.72);
+  }
+  col*=1.0-smoothstep(0.62,1.45,r);
+  float fg=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  col*=0.97+0.03*fg;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+SHADERS.ferrofluid = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+uniform float u_freq;
+#define PI   3.14159265
+#define SQRT3 1.73205080
+void nearest_hex(vec2 p, float scale, out vec2 centre, out vec2 frac) {
+  float inv=1.0/scale;
+  float fx=p.x*inv-p.y*inv/SQRT3;
+  float fy=p.y*inv*2.0/SQRT3;
+  float rx=floor(fx+0.5), ry=floor(fy+0.5), rz=floor(-fx-fy+0.5);
+  if (abs(rx-fx)>abs(ry-fy) && abs(rx-fx)>abs(rz+fx+fy)) rx=-ry-rz;
+  else if (abs(ry-fy)>abs(rz+fx+fy)) ry=-rx-rz;
+  centre=(rx*vec2(1.0,0.0)+ry*vec2(0.5,SQRT3*0.5))*scale;
+  frac=p-centre;
+}
+float acoustic_pattern(vec2 p, float time, float freq) {
+  float k=freq*0.07;
+  float w1=sin(k*p.x+time*0.75)*sin(k*p.y*1.08-time*0.55);
+  float w2=sin(k*p.x*1.25-time*0.60)*sin(k*p.y*0.88+time*0.48);
+  float w3=sin(k*(p.x+p.y)*0.65+time*1.05);
+  return (w1+w2*0.55+w3*0.30)/1.85;
+}
+float spike_profile(float dist, float height) {
+  float cone=max(0.0,height-dist*2.0);
+  return cone*cone*3.5;
+}
+void main() {
+  vec2 st=gl_FragCoord.xy/u_resolution.xy;
+  float ar=u_resolution.x/u_resolution.y;
+  vec2 uv=(st*2.0-1.0)*vec2(ar,1.0);
+  float r=length(uv);
+  float freq=(u_freq>0.0)?u_freq:40.0;
+  float hs=0.115;
+  vec2 centre,frac;
+  nearest_hex(uv,hs,centre,frac);
+  float fd=length(frac)/hs;
+  float cr=fract(sin(dot(centre,vec2(127.1,311.7)))*43758.5453);
+  float ac=acoustic_pattern(centre*9.0,u_time,freq);
+  float height=(0.60+0.12*cr)*(0.55+0.45*(ac*0.5+0.5));
+  float sv=spike_profile(fd,height);
+  vec2 c2,f2; nearest_hex(uv-vec2(hs*0.5,hs*SQRT3*0.25),hs,c2,f2);
+  float fd2=length(f2)/hs;
+  float r2=fract(sin(dot(c2,vec2(269.5,183.3)))*43758.5);
+  float ac2=acoustic_pattern(c2*7.0,u_time*1.15+0.4,freq);
+  float h2=(0.30+0.08*r2)*(0.4+0.6*(ac2*0.5+0.5));
+  float sv2=spike_profile(fd2,h2)*0.55;
+  float total=max(sv,sv2);
+  vec3 light=normalize(vec3(-0.6,0.8,1.4));
+  vec2 nr=length(frac)>0.001?normalize(frac):vec2(0.0);
+  vec3 N=normalize(vec3(nr*(-2.0*height)*0.6/hs,1.0));
+  float diff=max(0.0,dot(N,light));
+  vec3 H=normalize(light+vec3(0.0,0.0,1.0));
+  float spec=pow(max(0.0,dot(N,H)),28.0)*total*2.0;
+  vec3 base=vec3(0.05,0.035,0.06);
+  vec3 mid=vec3(0.14,0.10,0.18);
+  vec3 sc=vec3(0.72,0.65,0.80);
+  vec3 col=mix(base,mid,smoothstep(0.05,0.55,total)*diff)+sc*spec;
+  float flat=1.0-smoothstep(0.05,0.30,total);
+  col+=vec3(0.06,0.04,0.08)*(1.0-smoothstep(0.38,0.48,fd))*flat;
+  col+=vec3(0.05,0.03,0.07)*(ac*0.5+0.5)*flat*0.35;
+  float dm=1.0-smoothstep(0.88,0.95,r);
+  float rg=smoothstep(0.86,0.90,r)*(1.0-smoothstep(0.92,0.97,r));
+  vec3 bg=vec3(0.06,0.04,0.08);
+  col=mix(bg,col,dm)+vec3(0.40,0.22,0.05)*rg*0.50;
+  col*=1.0-smoothstep(0.65,1.45,r);
+  float fg=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  col*=0.97+0.03*fg;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+SHADERS.lissajous_sand = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+uniform float u_freq;
+#define PI   3.14159265
+float lissajous_field(vec2 p, float px, float py, float delta) {
+  return sin(px*PI*p.x)*sin(py*PI*p.y+delta);
+}
+void get_ratio(float freq, out float px, out float py, out float delta) {
+  float t=clamp((freq-30.0)/470.0,0.0,0.9999);
+  if      (t<0.1429){px=1.0;py=1.0;delta=PI*0.50;}
+  else if (t<0.2857){px=2.0;py=1.0;delta=PI*0.50;}
+  else if (t<0.4286){px=3.0;py=2.0;delta=PI*0.50;}
+  else if (t<0.5714){px=4.0;py=3.0;delta=PI*0.50;}
+  else if (t<0.7143){px=5.0;py=4.0;delta=PI*0.50;}
+  else if (t<0.8571){px=5.0;py=3.0;delta=PI*0.50;}
+  else              {px=7.0;py=4.0;delta=PI*0.50;}
+}
+float animated_field(vec2 p, float time, float freq) {
+  float px,py,delta; get_ratio(freq,px,py,delta);
+  float phase=delta+time*0.18;
+  return lissajous_field(p,px,py,phase)+lissajous_field(p,px+1.0,py,phase*1.25)*0.12;
+}
+void main() {
+  vec2 st=gl_FragCoord.xy/u_resolution.xy;
+  float ar=u_resolution.x/u_resolution.y;
+  vec2 uv=(st*2.0-1.0)*vec2(ar,1.0);
+  float r=length(uv);
+  float freq=(u_freq>0.0)?u_freq:220.0;
+  float half=0.82;
+  float bd=max(abs(uv.x),abs(uv.y));
+  float plate_mask=1.0-smoothstep(half-0.01,half+0.05,bd);
+  float rim_mask=smoothstep(half-0.07,half-0.02,bd)*(1.0-smoothstep(half-0.01,half+0.04,bd));
+  vec3 col=vec3(0.07,0.05,0.04);
+  if (plate_mask>0.01) {
+    float field=animated_field(uv/half,u_time,freq);
+    float node=1.0-smoothstep(0.0,0.11,abs(field));
+    float grain=fract(sin(dot(uv*105.0,vec2(127.1,311.7)))*43758.5453);
+    node*=0.74+0.26*grain;
+    float sc=fract(r*32.0+0.03*sin(atan(uv.y,uv.x)*18.0));
+    vec3 plate=vec3(0.55,0.55,0.59)*(0.90+0.10*sc);
+    vec3 sand_c=vec3(0.94,0.91,0.84);
+    float anti=smoothstep(0.55,1.0,abs(field));
+    vec3 pc=mix(plate,sand_c,node*0.92)+vec3(0.05,0.03,0.01)*anti;
+    pc=mix(pc,vec3(0.72,0.72,0.76),rim_mask*0.55);
+    col=mix(col,pc,plate_mask);
+  }
+  col*=1.0-smoothstep(0.85,1.65,length(uv));
+  float fg=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  col*=0.97+0.03*fg;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+SHADERS.quasiperiodic = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+#define PI   3.14159265
+#define TAU  6.28318530
+#define PHI  1.61803399
+float wave5(vec2 p, float k, float time, float drift) {
+  float f=0.0;
+  float a0=0.0*TAU/5.0; f+=cos(k*(p.x*cos(a0)+p.y*sin(a0))+time*drift+0.0*PHI);
+  float a1=1.0*TAU/5.0; f+=cos(k*(p.x*cos(a1)+p.y*sin(a1))+time*drift+1.0*PHI);
+  float a2=2.0*TAU/5.0; f+=cos(k*(p.x*cos(a2)+p.y*sin(a2))+time*drift+2.0*PHI);
+  float a3=3.0*TAU/5.0; f+=cos(k*(p.x*cos(a3)+p.y*sin(a3))+time*drift+3.0*PHI);
+  float a4=4.0*TAU/5.0; f+=cos(k*(p.x*cos(a4)+p.y*sin(a4))+time*drift+4.0*PHI);
+  return f/5.0;
+}
+float wave7(vec2 p, float k, float time, float drift) {
+  float f=0.0;
+  float a0=0.0*TAU/7.0; f+=cos(k*(p.x*cos(a0)+p.y*sin(a0))+time*drift+0.0*PHI);
+  float a1=1.0*TAU/7.0; f+=cos(k*(p.x*cos(a1)+p.y*sin(a1))+time*drift+1.0*PHI);
+  float a2=2.0*TAU/7.0; f+=cos(k*(p.x*cos(a2)+p.y*sin(a2))+time*drift+2.0*PHI);
+  float a3=3.0*TAU/7.0; f+=cos(k*(p.x*cos(a3)+p.y*sin(a3))+time*drift+3.0*PHI);
+  float a4=4.0*TAU/7.0; f+=cos(k*(p.x*cos(a4)+p.y*sin(a4))+time*drift+4.0*PHI);
+  float a5=5.0*TAU/7.0; f+=cos(k*(p.x*cos(a5)+p.y*sin(a5))+time*drift+5.0*PHI);
+  float a6=6.0*TAU/7.0; f+=cos(k*(p.x*cos(a6)+p.y*sin(a6))+time*drift+6.0*PHI);
+  return f/7.0;
+}
+float full_field(vec2 p, float time) {
+  float k1=3.60, k2=k1*PHI, k3=k1*PHI*PHI;
+  float A=wave5(p,k1,time,0.14);
+  float B=wave5(p,k2,time*PHI,0.09);
+  float C=wave7(p,k3,time*(PHI-1.0),0.06)*0.40;
+  return A*0.55+A*B*0.35+C;
+}
+void main() {
+  vec2 st=gl_FragCoord.xy/u_resolution.xy;
+  float ar=u_resolution.x/u_resolution.y;
+  vec2 uv=(st*2.0-1.0)*vec2(ar,1.0);
+  float field=full_field(uv*3.20,u_time);
+  float fn=clamp(field*0.80,-1.0,1.0);
+  vec3 bg=vec3(0.04,0.03,0.07);
+  vec3 pos=vec3(0.18,0.14,0.42);
+  vec3 neg=vec3(0.08,0.20,0.16);
+  vec3 nod=vec3(0.92,0.83,0.58);
+  float pv=max(0.0,fn), nv=max(0.0,-fn);
+  vec3 col=bg;
+  col=mix(col,pos,smoothstep(0.0,0.5,pv)*1.7*pv);
+  col=mix(col,neg,smoothstep(0.0,0.5,nv)*1.5*nv);
+  col=mix(col,nod,(1.0-smoothstep(0.0,0.14,abs(fn)))*0.88);
+  col+=mix(pos,neg,step(0.0,-fn))*smoothstep(0.72,1.0,abs(fn))*0.22;
+  float ang=atan(uv.y,uv.x);
+  col+=vec3(0.12,0.09,0.03)*(1.0-smoothstep(0.015,0.035,abs(fract(ang/TAU*5.0+0.5)-0.5)))*0.18;
+  col*=1.0-smoothstep(0.95,1.65,length(uv));
+  float fg=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  col*=0.97+0.03*fg;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+SHADERS.spherical_harmonics = `
+precision highp float;
+uniform vec2  u_resolution;
+uniform float u_time;
+#define PI   3.14159265
+#define TAU  6.28318530
+float P00(float c){return 1.0;}
+float P10(float c){return c;}
+float P11(float c){return -sqrt(max(0.0,1.0-c*c));}
+float P20(float c){return 0.5*(3.0*c*c-1.0);}
+float P21(float c){return -3.0*c*sqrt(max(0.0,1.0-c*c));}
+float P22(float c){return 3.0*(1.0-c*c);}
+float P30(float c){return 0.5*c*(5.0*c*c-3.0);}
+float P31(float c){float s2=max(0.0,1.0-c*c);return -1.5*(5.0*c*c-1.0)*sqrt(s2);}
+float P32(float c){return 15.0*c*(1.0-c*c);}
+float P33(float c){float s2=max(0.0,1.0-c*c);return -15.0*s2*sqrt(s2);}
+float P40(float c){float c2=c*c;return 0.125*(35.0*c2*c2-30.0*c2+3.0);}
+float P41(float c){float s2=max(0.0,1.0-c*c);return -2.5*c*(7.0*c*c-3.0)*sqrt(s2);}
+float P42(float c){float c2=c*c;return 7.5*(7.0*c2-1.0)*(1.0-c2);}
+float P43(float c){float s2=max(0.0,1.0-c*c);return -105.0*c*s2*sqrt(s2);}
+float P44(float c){float s2=max(0.0,1.0-c*c);return 105.0*s2*s2;}
+float Ylm(float l, float m, float theta, float phi) {
+  float cosT=cos(theta), absm=abs(m);
+  float angular=(m<-0.5)?sin(absm*phi):((m<0.5)?1.0:cos(absm*phi));
+  float P=0.0;
+  if      (l<0.5)                   P=P00(cosT);
+  else if (l<1.5&&absm<0.5)         P=P10(cosT);
+  else if (l<1.5&&absm<1.5)         P=P11(cosT);
+  else if (l<2.5&&absm<0.5)         P=P20(cosT);
+  else if (l<2.5&&absm<1.5)         P=P21(cosT);
+  else if (l<2.5&&absm<2.5)         P=P22(cosT);
+  else if (l<3.5&&absm<0.5)         P=P30(cosT);
+  else if (l<3.5&&absm<1.5)         P=P31(cosT);
+  else if (l<3.5&&absm<2.5)         P=P32(cosT);
+  else if (l<3.5&&absm<3.5)         P=P33(cosT);
+  else if (l<4.5&&absm<0.5)         P=P40(cosT);
+  else if (l<4.5&&absm<1.5)         P=P41(cosT);
+  else if (l<4.5&&absm<2.5)         P=P42(cosT);
+  else if (l<4.5&&absm<3.5)         P=P43(cosT);
+  else if (l<4.5&&absm<4.5)         P=P44(cosT);
+  return P*angular;
+}
+float harmonic_field(float theta, float phi, float time) {
+  float t=time*0.22; float f=0.0;
+  f+=Ylm(2.0, 0.0,theta,phi)*cos(t*1.00);
+  f+=Ylm(2.0, 2.0,theta,phi)*cos(t*1.30+1.05);
+  f+=Ylm(2.0,-2.0,theta,phi)*cos(t*0.80+2.09);
+  f+=Ylm(2.0, 1.0,theta,phi)*cos(t*1.55+3.14)*0.6;
+  f+=Ylm(2.0,-1.0,theta,phi)*cos(t*0.65+4.19)*0.6;
+  f+=Ylm(3.0, 1.0,theta,phi)*cos(t*1.70+0.52)*0.45;
+  f+=Ylm(3.0,-1.0,theta,phi)*cos(t*0.58+1.57)*0.45;
+  f+=Ylm(3.0, 3.0,theta,phi)*cos(t*0.62+2.62)*0.35;
+  f+=Ylm(3.0,-2.0,theta,phi)*cos(t*1.12+0.30)*0.30;
+  f+=Ylm(3.0, 0.0,theta,phi)*cos(t*0.95+1.00)*0.25;
+  f+=Ylm(4.0, 0.0,theta,phi)*cos(t*0.87+0.77)*0.22;
+  f+=Ylm(4.0, 4.0,theta,phi)*cos(t*1.40+2.80)*0.18;
+  f+=Ylm(4.0,-4.0,theta,phi)*cos(t*1.05+3.50)*0.18;
+  f+=Ylm(4.0, 2.0,theta,phi)*cos(t*0.72+1.20)*0.14;
+  return f;
+}
+void main() {
+  vec2 st=gl_FragCoord.xy/u_resolution.xy;
+  float ar=u_resolution.x/u_resolution.y;
+  float phi=st.x*TAU, theta=st.y*PI;
+  float Y=harmonic_field(theta,phi,u_time);
+  float Yn=clamp(Y*0.30,-1.0,1.0);
+  float pos=max(0.0,Yn), neg=max(0.0,-Yn);
+  vec3 pos_col=vec3(0.92,0.44,0.08);
+  vec3 neg_col=vec3(0.10,0.16,0.72);
+  vec3 node_col=vec3(0.02,0.02,0.04);
+  vec3 col=node_col;
+  col=mix(col,pos_col,smoothstep(0.0,0.5,pos)*1.6*pos);
+  col=mix(col,neg_col,smoothstep(0.0,0.5,neg)*1.6*neg);
+  col=mix(col,vec3(0.04,0.06,0.08),(1.0-smoothstep(0.0,0.055,abs(Yn)))*0.75);
+  float lat=smoothstep(0.010,0.018,abs(fract(st.y*6.0+0.5)-0.5));
+  float lon=smoothstep(0.005,0.012,abs(fract(st.x*12.0+0.5)-0.5));
+  col*=0.88+0.12*lat*lon;
+  col+=vec3(0.08,0.06,0.03)*(1.0-smoothstep(0.004,0.014,abs(st.y-0.5)))*0.35;
+  vec2 uv=st*2.0-1.0; uv.x*=ar;
+  col*=1.0-smoothstep(0.85,1.4,length(uv));
+  float fg=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  col*=0.97+0.03*fg;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
 const SHADER_INFO = {
-  chladni_square:   'Square brass plate · 432 Hz · sand at nodal lines · (m,n) Chladni modes',
-  faraday_hex:      'Water surface · vertical forcing · subharmonic instability · hexagonal tessellation',
-  singing_bowl:     'Tibetan bronze bowl · n=2..5 shell modes · water fountains at antinodes',
-  temple_resonance: 'Hal Saflieni Hypogeum · 110 Hz standing wave · oracle aperture · adjust freq slider'
+  chladni_square:      'Square brass plate · 432 Hz · sand at nodal lines · (m,n) Chladni modes',
+  chladni_circular:    'Circular steel plate · 432 Hz · lycopodium powder · Bessel J_m(k·r)·cos(m·θ) modes',
+  faraday_hex:         'Water surface · vertical forcing · subharmonic instability · hexagonal tessellation',
+  singing_bowl:        'Tibetan bronze bowl · n=2..5 shell modes · water fountains at antinodes',
+  cymascope_water:     'Cymascope dish · water + lycopodium · Bessel radial modes · lycopodium floats at antinodes · adjust freq',
+  temple_resonance:    'Hal Saflieni Hypogeum · 110 Hz standing wave · oracle aperture · adjust freq slider',
+  ferrofluid:          'Ferrofluid · Rosensweig instability · hexagonal spike array · acoustic height modulation · adjust freq',
+  lissajous_sand:      'Lissajous-Chladni · sand at nodal intersections · freq slider selects ratio: 1:1→2:1→3:2→4:3→5:4→5:3→7:4',
+  quasiperiodic:       'Quasiperiodic tiling · 5-fold Penrose-like + 7-fold · golden-ratio dual wave · the geometry of aperiodic eternity',
+  spherical_harmonics: 'Spherical harmonics Y_l^m(θ,φ) · equirectangular map · l=2..4 shells · red=positive · indigo=negative · black=nodal'
 };
 
 // ─── WebGL bootstrap ──────────────────────────────────────────────────────
