@@ -1,0 +1,66 @@
+{
+  "name": "Hexagonal Brass Plate — 396 Hz",
+  "shape": "hexagonal",
+  "side_length_mm": 180,
+  "thickness_mm": 1.5,
+  "material": {
+    "name": "cartridge_brass",
+    "composition": {
+      "copper_pct": 70,
+      "zinc_pct": 30
+    },
+    "density_kg_m3": 8500,
+    "youngs_modulus_GPa": 100,
+    "poisson_ratio": 0.34,
+    "speed_of_sound_m_s": 3430,
+    "damping_factor": 0.008
+  },
+  "boundary": "clamped_center",
+  "drive_point": "center",
+  "fundamental_hz": 396,
+  "modes": [
+    {
+      "symmetry": "C6v",
+      "freq_hz": 396,
+      "label": "(1,0)",
+      "nodal_lines": 2,
+      "pattern": "Y-axis split — two sectors",
+      "sacred": "Duality within the hexagon"
+    },
+    {
+      "symmetry": "C6v",
+      "freq_hz": 792,
+      "label": "(2,0)",
+      "nodal_lines": 3,
+      "pattern": "Three-fold star — triskelion",
+      "sacred": "Trinity, spiral of time"
+    },
+    {
+      "symmetry": "C6v",
+      "freq_hz": 1188,
+      "label": "(3,0)",
+      "nodal_lines": 6,
+      "pattern": "Hexagram with six triangles",
+      "sacred": "Star of David, Metatron's Cube"
+    },
+    {
+      "symmetry": "C6v",
+      "freq_hz": 1584,
+      "label": "(4,0)",
+      "nodal_lines": 6,
+      "pattern": "Complex twelve-pointed star",
+      "sacred": "Twelve tribes, cosmic completion"
+    },
+    {
+      "symmetry": "C3v",
+      "freq_hz": 1980,
+      "label": "(5,1) — symmetry broken",
+      "nodal_lines": 8,
+      "pattern": "Asymmetric triskelion with ring",
+      "sacred": "Chaos and order balanced"
+    }
+  ],
+  "medium": "sand",
+  "notes": "The hexagonal plate is unique: its C6v symmetry means the (1,0), (3,0) modes produce perfect hexagrams directly — no constructive coincidence needed. The 3n modes always produce 3n-fold patterns. 396 Hz is the first Solfeggio tone (Ut — liberation).",
+  "construction_notes": "Cut from rolled brass sheet using CNC; edges filed and polished. Drive at geometric centre. Rest on three equidistant rubber pads at 60° to each corner midpoint to preserve C6v symmetry."
+}

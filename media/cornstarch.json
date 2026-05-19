@@ -1,0 +1,32 @@
+{
+  "name": "Cornstarch Suspension (Oobleck)",
+  "type": "non_newtonian_fluid",
+  "use_case": "Vertical plate vibration demonstration; shear-thickening Faraday-adjacent patterns",
+  "composition": {
+    "cornstarch_pct_by_mass": 50,
+    "water_pct_by_mass": 50,
+    "notes": "Exact ratio critical — 45% cornstarch produces runny suspension; 55% produces solid-like behaviour. 50/50 is the sweet spot for cymatic demonstrations."
+  },
+  "density_kg_m3": 1200,
+  "rheology": {
+    "type": "shear_thickening",
+    "low_shear_viscosity_Pas": 0.01,
+    "high_shear_viscosity_Pas": "effectively_solid",
+    "crossover_shear_rate_per_s": 10,
+    "mechanism": "Under low stress: cornstarch particles are in quasi-liquid suspension. Under high stress (rapid vibration): the hydration shells between particles squeeze out and the particles jam together, forming a temporary solid."
+  },
+  "behavior_at_sound": {
+    "low_amplitude": "Flows like thick cream; Faraday waves appear on surface",
+    "medium_amplitude": "Fingers and tendrils form — the surface 'grabs' and holds shapes between vibration cycles",
+    "high_amplitude": "Explosive — the surface erupts into standing pillars, fingers, and jets that appear to defy gravity (they solidify briefly on each compression stroke)",
+    "special_phenomenon": "At the right frequency and amplitude, stable standing columns form that look like living organisms. These are the most viscerally striking cymatic demonstration known."
+  },
+  "color_hex": "#F0EBD0",
+  "notes": "The cornstarch demonstration is NOT a Chladni figure — it does not form nodal lines. It is a demonstration of shear-thickening resonance where the acoustically-induced shear creates transient solidification patterns. Philosophically distinct from sand-plate cymatics but visually overwhelming.",
+  "cymatic_category": "non_newtonian_acoustic_instability",
+  "safety": "Non-toxic, fully edible. Extremely messy. Use over newspaper or in a rimmed tray. Blue food colouring improves visibility.",
+  "references": [
+    "Merkt, F.S. et al. (2004). Long-lived Faraday wave patterns on a zero-mean-flow soap film. Physical Review Letters, 92(18).",
+    "Scott, A.B. (2004). Oobleck: The non-Newtonian fluid that dances to sound. Physics Teacher, 42, 414."
+  ]
+}
