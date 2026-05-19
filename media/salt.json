@@ -1,0 +1,28 @@
+{
+  "name": "Salt — Coarse Kosher",
+  "type": "granular",
+  "use_case": "Chladni plates, visible demonstration (larger particles than sand)",
+  "particle_size_um": { "min": 500, "max": 2000, "median": 900 },
+  "particle_shape": "cubic",
+  "density_kg_m3": 2160,
+  "angle_of_repose_deg": 26,
+  "coefficient_of_restitution": 0.35,
+  "friction_coefficient": 0.40,
+  "hygroscopic": true,
+  "behavior": {
+    "migration": "antinodes_to_nodes",
+    "mechanism": "At the boundary between antinode (high vibration) and node (still), the net time-averaged radiation pressure force on a granule is directed toward the node. For salt, the cubic shape creates rolling friction different from spherical sand.",
+    "visible_threshold_hz": 30,
+    "pattern_clarity": "excellent at 50–400 Hz; too coarse above 800 Hz",
+    "special_note": "Salt is hygroscopic — humidity above 75% causes the crystals to stick together, creating bridges across nodal lines that preserve the last-seen pattern even after the sound stops. This 'acoustic fossil' effect is visible for hours in humid conditions."
+  },
+  "color_hex": "#F5F2EC",
+  "notes": "The cubic particle shape creates sharper nodal line edges than spherical sand, because the crystals stack against each other cleanly at the node boundary. Use table salt for fine detail; kosher salt for visibility in demonstrations. Avoid fine-ground iodised salt — the iodine additive increases clumping.",
+  "demonstration_notes": {
+    "frequency_range": "30–400 Hz on a 300mm plate",
+    "depth_on_plate_mm": 0.5,
+    "spread_method": "Even dusting from 20cm height",
+    "cleanup": "Vacuum; salt is non-hazardous and biodegradable",
+    "fire_caution": "Salt on a brass plate heated by a speaker coil can cause corrosion; keep drive amplitudes below plate-warming threshold"
+  }
+}
