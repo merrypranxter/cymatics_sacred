@@ -1,0 +1,34 @@
+{
+  "name": "Crystal Singing Bowl — Quartz Glass",
+  "shape": "hemispherical_shell",
+  "outer_diameter_mm": 250,
+  "rim_diameter_mm": 248,
+  "height_mm": 105,
+  "wall_thickness_mm": 5.0,
+  "material": {
+    "name": "fused_quartz",
+    "composition": {
+      "SiO2_pct": 99.9,
+      "notes": "Optically pure fused quartz; free of metallic impurities that would damp the overtone series"
+    },
+    "density_kg_m3": 2200,
+    "youngs_modulus_GPa": 72,
+    "poisson_ratio": 0.17,
+    "damping_factor": 0.0003,
+    "notes": "Extremely low damping — Q factor can exceed 10,000. The bowl rings for minutes after a single strike."
+  },
+  "boundary": "free_rim",
+  "drive_methods": ["mallet_outside_rim", "mallet_inside_rim", "bow_rim_stroke"],
+  "fundamental_hz": 432,
+  "modes": [
+    { "n": 2, "freq_hz": 432,  "name": "Quadrupole",  "antinodes": 4,  "sacred": "Foundation — the fourfold cross" },
+    { "n": 3, "freq_hz": 864,  "name": "Sextupole",   "antinodes": 6,  "sacred": "Hexagram — Star of David" },
+    { "n": 4, "freq_hz": 1440, "name": "Octupole",    "antinodes": 8,  "sacred": "Octagram — eight directions" },
+    { "n": 5, "freq_hz": 2160, "name": "Decapole",    "antinodes": 10, "sacred": "Ten-pointed star" },
+    { "n": 6, "freq_hz": 3024, "name": "Dodecapole",  "antinodes": 12, "sacred": "Twelve-fold completion" }
+  ],
+  "water_fill_pct": 40,
+  "notes": "Crystal bowls produce a much purer overtone series than metal. The high-Q resonance means the pattern locks in instantly and holds. At 432 Hz the n=2 mode creates four symmetrical standing-wave columns of water visible through the transparent walls.",
+  "visual_medium": "water + lycopodium_powder",
+  "cymascope_note": "Lycopodium floats at water antinodes — four cream-coloured islands appearing at 90° intervals at 432 Hz. At 864 Hz (n=3, octave) six islands appear. The glass wall allows side-view photography of the 3D standing wave."
+}

@@ -128,3 +128,44 @@ See `examples/bessel_modes.py` for a complete plate eigenvalue solver.
 ---
 
 *Every zero of J_m is a silence inscribed in the wave equation. Between the silences, the plate sings.*
+
+---
+
+## Relative Frequency Ratios (432 Hz Base Tuning)
+
+For a plate tuned so that mode (0,1) plays at 432 Hz, other modes fall at:
+
+```
+f_{mn} / f_{0,1} = (α_{mn} / α_{0,1})²  =  (α_{mn} / 2.4048)²
+```
+
+| Mode (m,n) | α_{mn} | Ratio to (0,1) | Hz at 432 base | Pattern |
+|-----------|--------|----------------|----------------|---------|
+| (0,1) | 2.405 | 1.000 | 432 | Bullseye |
+| (1,1) | 3.832 | 2.537 | 1096 | Yin-yang |
+| (2,1) | 5.136 | 4.561 | 1970 | Triskelion |
+| (0,2) | 5.520 | 5.273 | 2278 | Two rings |
+| (3,1) | 6.380 | 7.047 | 3044 | Four-leaf |
+| (1,2) | 7.016 | 8.519 | 3680 | Yin-yang + ring |
+| (4,1) | 7.588 | 9.952 | 4299 | Pentagram |
+| (2,2) | 8.417 | 12.25 | 5292 | Triskelion + ring |
+| (0,3) | 8.654 | 12.94 | 5590 | Three rings |
+| (5,1) | 8.772 | 13.29 | 5741 | Hexagram |
+| (3,2) | 9.761 | 16.47 | 7115 | Four-leaf + ring |
+| (6,1) | 9.936 | 17.07 | 7374 | Heptagram |
+
+The plate's spectrum is **inharmonic** — overtones are not integer multiples of the fundamental.
+This inharmonicity (vs. a string's perfectly harmonic series) gives bells and bowls their shimmer.
+
+## McMahon's Asymptotic Expansion
+
+For large zeros, a fast approximation (accurate to <0.01% for n ≥ 3):
+
+```
+α_{m,n} ≈ β − (4m²−1)/(8β) − 4(4m²−1)(28m²−31)/(3(8β)³) + …
+where β = π·(n + m/2 − 1/4)
+```
+
+In GLSL shaders, the asymptote `J_m(x) ≈ √(2/πx) · cos(x − mπ/2 − π/4)` is used for
+`x > 3` (accurate to within 1% — sufficient for visual nodal patterns).
+

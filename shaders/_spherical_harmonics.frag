@@ -1,190 +1,155 @@
-// MEDIUM: Spherical harmonics — Y(l,m) eigenfunctions on the 2-sphere
-// FREQUENCY: No acoustic driver — pure eigenfunction visualization
-// GEOMETRY: Full sphere mapped equirectangularly to rectangle; cycles l=0..5
-// SACRED: Atomic orbitals, planetary shells, the alphabet of standing waves in 3D
+// MEDIUM: Spherical harmonics — eigenfunctions of the Laplacian on S²
+// FREQUENCY: l = 0..4 orbital shells; m = −l..l azimuthal indices
+// GEOMETRY: Equirectangular map of the sphere: x = φ ∈ [0, 2π], y = θ ∈ [0, π]
+// SACRED: Atomic orbitals, planetary vibration modes, the alphabet of God's geometry
 
 precision highp float;
 
 uniform vec2  u_resolution;
 uniform float u_time;
 
-#define PI  3.14159265
-#define TAU 6.28318530
-#define SQRT2  1.41421356
-#define SQRT3  1.73205081
-#define SQRT5  2.23606798
-#define SQRT6  2.44948975
-#define SQRT10 3.16227766
-#define SQRT15 3.87298335
+#define PI   3.14159265
+#define TAU  6.28318530
 
-// ─── Real spherical harmonics (Racah's normalisation) ──────────────────────
-// Convention: Y_l^m where m ≥ 0 uses cosine; m < 0 uses sine
-// Evaluated at colatitude theta (0=north pole) and longitude phi.
+// ─── Associated Legendre polynomials P_l^|m|(cos θ) ──────────────────────
+// Unnormalised; sign conventions following Condon-Shortley where marked
 
-// l=0
-float Y00(float ct, float st, float cp, float sp) {
-    return 0.28209479; // 1/(2√π)
-}
+float P00(float c) { return 1.0; }
 
-// l=1
-float Y10(float ct, float st, float cp, float sp) {
-    return 0.48860251 * ct;                        // √(3/4π) · cos θ
-}
-float Y11c(float ct, float st, float cp, float sp) {
-    return 0.48860251 * st * cp;                   // √(3/4π) · sin θ · cos φ
-}
-float Y11s(float ct, float st, float cp, float sp) {
-    return 0.48860251 * st * sp;                   // √(3/4π) · sin θ · sin φ
-}
+// l = 1
+float P10(float c) { return c; }
+float P11(float c) { return -sqrt(max(0.0, 1.0 - c*c)); }
 
-// l=2
-float Y20(float ct, float st, float cp, float sp) {
-    return 0.31539157 * (3.0*ct*ct - 1.0);         // √(5/16π) · (3cos²θ−1)
-}
-float Y21c(float ct, float st, float cp, float sp) {
-    return 1.09254843 * st * ct * cp;              // √(15/4π) · sin θ cos θ cos φ
-}
-float Y21s(float ct, float st, float cp, float sp) {
-    return 1.09254843 * st * ct * sp;
-}
-float Y22c(float ct, float st, float cp, float sp) {
-    return 0.54627422 * st * st * (cp*cp - sp*sp); // √(15/16π) · sin²θ · cos 2φ
-}
-float Y22s(float ct, float st, float cp, float sp) {
-    return 1.09254843 * st * st * cp * sp;         // √(15/4π) · sin²θ · sin 2φ
-}
+// l = 2
+float P20(float c) { return 0.5 * (3.0*c*c - 1.0); }
+float P21(float c) { return -3.0 * c * sqrt(max(0.0, 1.0 - c*c)); }
+float P22(float c) { return  3.0 * (1.0 - c*c); }
 
-// l=3
-float Y30(float ct, float st, float cp, float sp) {
-    float c = ct;
-    return 0.37317633 * (5.0*c*c*c - 3.0*c);      // √(7/16π) · (5cos³θ−3cosθ)
-}
-float Y31c(float ct, float st, float cp, float sp) {
-    return 0.45704580 * st * (5.0*ct*ct - 1.0) * cp;
-}
-float Y31s(float ct, float st, float cp, float sp) {
-    return 0.45704580 * st * (5.0*ct*ct - 1.0) * sp;
-}
-float Y32c(float ct, float st, float cp, float sp) {
-    return 1.44530573 * st*st * ct * (cp*cp - sp*sp);
-}
-float Y32s(float ct, float st, float cp, float sp) {
-    return 2.89061145 * st*st * ct * cp * sp;
-}
-float Y33c(float ct, float st, float cp, float sp) {
-    float s3 = st*st*st;
-    return 0.59004358 * s3 * (cp*cp*cp - 3.0*cp*sp*sp);
-}
-float Y33s(float ct, float st, float cp, float sp) {
-    float s3 = st*st*st;
-    return 0.59004358 * s3 * (3.0*sp*cp*cp - sp*sp*sp);
+// l = 3
+float P30(float c) { return 0.5 * c * (5.0*c*c - 3.0); }
+float P31(float c) { float s2 = max(0.0, 1.0-c*c); return -1.5*(5.0*c*c-1.0)*sqrt(s2); }
+float P32(float c) { return 15.0 * c * (1.0 - c*c); }
+float P33(float c) { float s2 = max(0.0, 1.0-c*c); return -15.0*s2*sqrt(s2); }
+
+// l = 4
+float P40(float c) { float c2=c*c; return 0.125*(35.0*c2*c2 - 30.0*c2 + 3.0); }
+float P41(float c) { float s2=max(0.0,1.0-c*c); return -2.5*c*(7.0*c*c-3.0)*sqrt(s2); }
+float P42(float c) { float c2=c*c; return 7.5*(7.0*c2-1.0)*(1.0-c2); }
+float P43(float c) { float s2=max(0.0,1.0-c*c); return -105.0*c*s2*sqrt(s2); }
+float P44(float c) { float s2=max(0.0,1.0-c*c); return 105.0*s2*s2; }
+
+// ─── Real spherical harmonics Y_l^m(θ, φ) ────────────────────────────────
+// Y_l^0  = N · P_l^0(cosθ)
+// Y_l^m  = N · P_l^m(cosθ) · cos(m·φ)   m > 0
+// Y_l^-m = N · P_l^m(cosθ) · sin(m·φ)   m < 0
+// (Normalisation factors omitted — visual purposes only)
+
+float Ylm(float l, float m, float theta, float phi) {
+    float cosT  = cos(theta);
+    float absm  = abs(m);
+
+    float angular;
+    if (m < -0.5)      angular = sin(absm * phi);
+    else if (m < 0.5)  angular = 1.0;
+    else               angular = cos(absm * phi);
+
+    float P = 0.0;
+
+    if      (l < 0.5)                      P = P00(cosT);
+    else if (l < 1.5 && absm < 0.5)        P = P10(cosT);
+    else if (l < 1.5 && absm < 1.5)        P = P11(cosT);
+    else if (l < 2.5 && absm < 0.5)        P = P20(cosT);
+    else if (l < 2.5 && absm < 1.5)        P = P21(cosT);
+    else if (l < 2.5 && absm < 2.5)        P = P22(cosT);
+    else if (l < 3.5 && absm < 0.5)        P = P30(cosT);
+    else if (l < 3.5 && absm < 1.5)        P = P31(cosT);
+    else if (l < 3.5 && absm < 2.5)        P = P32(cosT);
+    else if (l < 3.5 && absm < 3.5)        P = P33(cosT);
+    else if (l < 4.5 && absm < 0.5)        P = P40(cosT);
+    else if (l < 4.5 && absm < 1.5)        P = P41(cosT);
+    else if (l < 4.5 && absm < 2.5)        P = P42(cosT);
+    else if (l < 4.5 && absm < 3.5)        P = P43(cosT);
+    else if (l < 4.5 && absm < 4.5)        P = P44(cosT);
+
+    return P * angular;
 }
 
-// l=4
-float Y40(float ct, float st, float cp, float sp) {
-    float c = ct; float c2 = c*c;
-    return 0.10578554 * (35.0*c2*c2 - 30.0*c2 + 3.0);
-}
-float Y44c(float ct, float st, float cp, float sp) {
-    float s4 = st*st*st*st;
-    float cos4 = 1.0 - 8.0*sp*sp*(1.0 - sp*sp); // cos(4φ)
-    return 0.62583573 * s4 * cos4;
-}
-float Y44s(float ct, float st, float cp, float sp) {
-    float s4 = st*st*st*st;
-    float sin4 = 4.0 * cp*sp * (cp*cp - sp*sp);
-    return 0.62583573 * s4 * sin4;
-}
+// ─── Animated superposition: slowly morphs between l-shells ──────────────
+float harmonic_field(float theta, float phi, float time) {
+    float t = time * 0.22;
+    float f = 0.0;
 
-// ─── Mode cycling ─────────────────────────────────────────────────────────
-// Evaluates one Y_l^m at a time, cycling smoothly with time.
-// Returns a signed value in approximately [-1, 1].
+    // l = 2 shell — the d-orbitals; 5 modes
+    f += Ylm(2.0,  0.0, theta, phi) * cos(t * 1.00);
+    f += Ylm(2.0,  2.0, theta, phi) * cos(t * 1.30 + 1.05);
+    f += Ylm(2.0, -2.0, theta, phi) * cos(t * 0.80 + 2.09);
+    f += Ylm(2.0,  1.0, theta, phi) * cos(t * 1.55 + 3.14) * 0.6;
+    f += Ylm(2.0, -1.0, theta, phi) * cos(t * 0.65 + 4.19) * 0.6;
 
-float eval_mode(int idx, float ct, float st, float cp, float sp) {
-    if (idx == 0)  return Y00(ct,st,cp,sp)  / 0.28;
-    if (idx == 1)  return Y10(ct,st,cp,sp)  / 0.49;
-    if (idx == 2)  return Y11c(ct,st,cp,sp) / 0.49;
-    if (idx == 3)  return Y11s(ct,st,cp,sp) / 0.49;
-    if (idx == 4)  return Y20(ct,st,cp,sp)  / 0.63;
-    if (idx == 5)  return Y21c(ct,st,cp,sp) / 1.09;
-    if (idx == 6)  return Y21s(ct,st,cp,sp) / 1.09;
-    if (idx == 7)  return Y22c(ct,st,cp,sp) / 1.09;
-    if (idx == 8)  return Y22s(ct,st,cp,sp) / 1.09;
-    if (idx == 9)  return Y30(ct,st,cp,sp)  / 0.75;
-    if (idx == 10) return Y31c(ct,st,cp,sp) / 0.92;
-    if (idx == 11) return Y31s(ct,st,cp,sp) / 0.92;
-    if (idx == 12) return Y32c(ct,st,cp,sp) / 1.45;
-    if (idx == 13) return Y32s(ct,st,cp,sp) / 1.45;
-    if (idx == 14) return Y33c(ct,st,cp,sp) / 1.77;
-    if (idx == 15) return Y33s(ct,st,cp,sp) / 1.77;
-    if (idx == 16) return Y40(ct,st,cp,sp)  / 0.85;
-    if (idx == 17) return Y44c(ct,st,cp,sp) / 1.88;
-    return Y44s(ct,st,cp,sp) / 1.88;
-}
+    // l = 3 shell — the f-orbitals; 7 modes (partial)
+    f += Ylm(3.0,  1.0, theta, phi) * cos(t * 1.70 + 0.52) * 0.45;
+    f += Ylm(3.0, -1.0, theta, phi) * cos(t * 0.58 + 1.57) * 0.45;
+    f += Ylm(3.0,  3.0, theta, phi) * cos(t * 0.62 + 2.62) * 0.35;
+    f += Ylm(3.0, -2.0, theta, phi) * cos(t * 1.12 + 0.30) * 0.30;
+    f += Ylm(3.0,  0.0, theta, phi) * cos(t * 0.95 + 1.00) * 0.25;
 
-// ─── Colour map for spherical harmonics ────────────────────────────────────
-// + lobe: warm gold-orange  ·  − lobe: cool indigo-violet  ·  node: near-black
+    // l = 4 shell — fine detail
+    f += Ylm(4.0,  0.0, theta, phi) * cos(t * 0.87 + 0.77) * 0.22;
+    f += Ylm(4.0,  4.0, theta, phi) * cos(t * 1.40 + 2.80) * 0.18;
+    f += Ylm(4.0, -4.0, theta, phi) * cos(t * 1.05 + 3.50) * 0.18;
+    f += Ylm(4.0,  2.0, theta, phi) * cos(t * 0.72 + 1.20) * 0.14;
 
-vec3 sh_palette(float val) {
-    float pos = max(0.0,  val);
-    float neg = max(0.0, -val);
-    vec3 pos_col = mix(vec3(0.08, 0.06, 0.04), vec3(0.95, 0.72, 0.20), sqrt(pos));
-    vec3 neg_col = mix(vec3(0.06, 0.05, 0.08), vec3(0.30, 0.22, 0.80), sqrt(neg));
-    return pos_col + neg_col;
+    return f;
 }
 
 void main() {
-    vec2 st = gl_FragCoord.xy / u_resolution.xy;
+    vec2 st  = gl_FragCoord.xy / u_resolution.xy;
+    float ar = u_resolution.x / u_resolution.y;
 
-    // Equirectangular projection:
-    //   x → longitude φ ∈ [−π, π]
-    //   y → colatitude θ ∈ [0, π]   (y=0 is north pole)
-    float phi   =  (st.x * 2.0 - 1.0) * PI;   // -π … +π
-    float theta =  st.y * PI;                  // 0 … π
+    // Equirectangular projection
+    // x-axis → azimuth φ ∈ [0, 2π]
+    // y-axis → polar  θ ∈ [0, π]
+    float phi   = st.x * TAU;
+    float theta = st.y * PI;
 
-    float ct = cos(theta);
-    float st2 = sin(theta);
-    float cp = cos(phi);
-    float sp = sin(phi);
+    float Y = harmonic_field(theta, phi, u_time);
 
-    // Slow cycle through 19 modes, spending ~4 s on each, with cross-fade
-    int N_modes = 19;
-    float period  = 4.0;
-    float t_mod   = mod(u_time, float(N_modes) * period);
-    float phase   = t_mod / period;             // 0 .. N_modes (continuous)
-    int   cur     = int(mod(floor(phase), float(N_modes)));
-    int   nxt     = int(mod(float(cur + 1), float(N_modes)));
-    float blend   = smoothstep(0.7, 1.0, fract(phase));  // cross-fade at 70%
+    // Normalise for display
+    float Yn = clamp(Y * 0.30, -1.0, 1.0);
 
-    float val_a = eval_mode(cur, ct, st2, cp, sp);
-    float val_b = eval_mode(nxt, ct, st2, cp, sp);
-    float val   = mix(val_a, val_b, blend);
+    float pos = max(0.0,  Yn);
+    float neg = max(0.0, -Yn);
 
-    vec3 col = sh_palette(val);
+    // Colour palette: hot orange-red (positive), deep indigo (negative), black (nodes)
+    vec3 pos_col  = vec3(0.92, 0.44, 0.08);
+    vec3 neg_col  = vec3(0.10, 0.16, 0.72);
+    vec3 node_col = vec3(0.02, 0.02, 0.04);
 
-    // Nodal lines: thin dark stripes at zero crossings
-    float nodal = 1.0 - smoothstep(0.0, 0.04, abs(val));
-    col *= 1.0 - nodal * 0.75;
+    vec3 col = node_col;
+    col = mix(col, pos_col, smoothstep(0.0, 0.5, pos) * 1.6 * pos);
+    col = mix(col, neg_col, smoothstep(0.0, 0.5, neg) * 1.6 * neg);
 
-    // Latitude grid lines every 30°
-    float lat_line = 1.0 - smoothstep(0.0, 0.008, abs(sin(theta * 6.0)));
-    float lon_line = 1.0 - smoothstep(0.0, 0.008, abs(sin(phi   * 6.0)));
-    col *= 1.0 - 0.18 * max(lat_line, lon_line);
+    // Nodal lines: where Y = 0 (the silence lines of the sphere)
+    float nodal = 1.0 - smoothstep(0.0, 0.055, abs(Yn));
+    col = mix(col, vec3(0.04, 0.06, 0.08), nodal * 0.75);
 
-    // Pole singularity fade (equirectangular distorts poles)
-    float pole_fade = smoothstep(0.0, 0.08, theta) * smoothstep(PI, PI - 0.08, theta);
-    col *= pole_fade;
+    // Faint latitude/longitude grid for orientation
+    float lat = smoothstep(0.010, 0.018, abs(fract(st.y * 6.0 + 0.5) - 0.5));
+    float lon = smoothstep(0.005, 0.012, abs(fract(st.x * 12.0 + 0.5) - 0.5));
+    col *= 0.88 + 0.12 * lat * lon;
 
-    // Mode label: display l, m values as subtle overlay pulse
-    float pulse = 0.5 + 0.5 * sin(u_time * PI * 2.0 / period);
+    // Equator highlight
+    float equator = 1.0 - smoothstep(0.004, 0.014, abs(st.y - 0.5));
+    col += vec3(0.08, 0.06, 0.03) * equator * 0.35;
 
-    // Vignette
-    vec2 uv_vig = st * 2.0 - 1.0;
-    col *= 1.0 - smoothstep(0.7, 1.2, length(uv_vig));
+    // Vignette: letterbox the top/bottom poles
+    vec2 uv = st * 2.0 - 1.0;
+    uv.x *= ar;
+    col *= 1.0 - smoothstep(0.85, 1.4, length(uv));
 
     // Film grain
-    float grain = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
-    col *= 0.97 + 0.03 * grain;
+    float fg = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    col *= 0.97 + 0.03 * fg;
 
     gl_FragColor = vec4(col, 1.0);
 }
