@@ -1,32 +1,56 @@
 {
-  "name": "Cornstarch Suspension (Oobleck)",
+  "name": "Cornstarch Suspension — Oobleck",
   "type": "non_newtonian_fluid",
-  "use_case": "Vertical plate vibration demonstration; shear-thickening Faraday-adjacent patterns",
+  "use_case": "Acoustic levitation, cornstarch monsters, discontinuous-medium cymatics",
   "composition": {
-    "cornstarch_pct_by_mass": 50,
-    "water_pct_by_mass": 50,
-    "notes": "Exact ratio critical — 45% cornstarch produces runny suspension; 55% produces solid-like behaviour. 50/50 is the sweet spot for cymatic demonstrations."
+    "cornstarch_mass_fraction": 0.55,
+    "water_mass_fraction": 0.45,
+    "note": "Exact ratio is critical. Too dry: mixture cracks and breaks. Too wet: behaves as normal fluid. 55/45 by mass gives optimal dilatancy."
   },
-  "density_kg_m3": 1200,
   "rheology": {
-    "type": "shear_thickening",
-    "low_shear_viscosity_Pas": 0.01,
-    "high_shear_viscosity_Pas": "effectively_solid",
-    "crossover_shear_rate_per_s": 10,
-    "mechanism": "Under low stress: cornstarch particles are in quasi-liquid suspension. Under high stress (rapid vibration): the hydration shells between particles squeeze out and the particles jam together, forming a temporary solid."
+    "type": "shear_thickening (dilatant)",
+    "behaviour": "At low shear rates: behaves as a fluid (pours, flows). At high shear rates: behaves as a solid (resists rapid impact). The transition is near-instantaneous.",
+    "apparent_viscosity_at_rest_Pa_s": 1.5,
+    "apparent_viscosity_at_impact_Pa_s": ">100 (effectively solid)",
+    "mechanism": "Shear thickening in dense suspensions arises from jamming of particle contacts. At high shear rates, particles cannot rearrange fast enough and lock into a jammed network.",
+    "dynamic_jamming_threshold_shear_rate_1_s": 50
   },
-  "behavior_at_sound": {
-    "low_amplitude": "Flows like thick cream; Faraday waves appear on surface",
-    "medium_amplitude": "Fingers and tendrils form — the surface 'grabs' and holds shapes between vibration cycles",
-    "high_amplitude": "Explosive — the surface erupts into standing pillars, fingers, and jets that appear to defy gravity (they solidify briefly on each compression stroke)",
-    "special_phenomenon": "At the right frequency and amplitude, stable standing columns form that look like living organisms. These are the most viscerally striking cymatic demonstration known."
+  "acoustic_behaviour": {
+    "primary_phenomenon": "The dilatancy creates extraordinary acoustic phenomena. When driven at audio frequencies on a speaker membrane, the cornstarch develops 'fingers' — stable column-like protrusions that form at acoustic antinodes.",
+    "finger_formation_frequency_hz": "60–120 Hz optimal; 20 Hz minimum to see formation",
+    "finger_height_mm": "20–80 mm at 80 dBSPL surface level",
+    "finger_morphology": "Conical columns that stretch upward from the surface. Unlike ferrofluid spikes (which are stable), cornstarch fingers periodically extend and retract — each finger has a 'lifetime' of 0.5–2 seconds before collapsing and reforming elsewhere.",
+    "pattern_type": "Nodal geometry similar to Faraday waves, but in a discontinuous medium — the columns are in the antinode positions (high amplitude), not the nodes. This is the OPPOSITE of dry granular media.",
+    "why_antinodes": "Sand migrates to nodes (minimum amplitude). Cornstarch/oobleck accumulates at antinodes because the high-amplitude vibration locally increases the shear rate, causing local solidification — the solid columns are held up by acoustic radiation pressure.",
+    "standing_wave_coupling": "At resonant frequencies of the driving surface, columns form geometric arrangements: hexagonal for most frequencies, square at specific depth/frequency ratios."
   },
-  "color_hex": "#F0EBD0",
-  "notes": "The cornstarch demonstration is NOT a Chladni figure — it does not form nodal lines. It is a demonstration of shear-thickening resonance where the acoustically-induced shear creates transient solidification patterns. Philosophically distinct from sand-plate cymatics but visually overwhelming.",
-  "cymatic_category": "non_newtonian_acoustic_instability",
-  "safety": "Non-toxic, fully edible. Extremely messy. Use over newspaper or in a rimmed tray. Blue food colouring improves visibility.",
-  "references": [
-    "Merkt, F.S. et al. (2004). Long-lived Faraday wave patterns on a zero-mean-flow soap film. Physical Review Letters, 92(18).",
-    "Scott, A.B. (2004). Oobleck: The non-Newtonian fluid that dances to sound. Physics Teacher, 42, 414."
+  "visual_properties": {
+    "color": "Off-white to pale grey",
+    "appearance_at_rest": "Smooth matte surface, milk-like",
+    "appearance_driven": "A roiling, writhing landscape of extending and collapsing columns; organic, almost biological in appearance",
+    "color_hex": "#E8E2D0"
+  },
+  "safety": {
+    "non_toxic": true,
+    "food_grade": true,
+    "cleanup": "Dissolves in water; avoid letting it dry in crevices (very difficult to remove when dried)",
+    "electrical_safety": "Keep away from speaker terminals and electronic equipment — it conducts slightly when wet",
+    "vibration_hazard": "High-amplitude driving (>100 Hz, >100 dBSPL) can launch material ballistically. Use a containment lip around the speaker."
+  },
+  "preparation": {
+    "recipe": "Add cornstarch to water slowly while stirring. Never add water to dry cornstarch (lumps). Stir until uniform. Let rest 30 minutes. Adjust: add small amounts of cornstarch if too fluid, water if too stiff.",
+    "test": "Punch the surface rapidly with one finger. If it hurts (the mixture resists), it's correct. If the finger sinks slowly, add more cornstarch.",
+    "speaker_setup": "Pour 1–3 cm depth onto a speaker cone or flat membrane. Frequency response of speaker must include 60–120 Hz range. Use a subwoofer or full-range speaker in a sealed cabinet.",
+    "film": "The dynamics change rapidly. Use high-speed video (120–240 fps) to capture finger formation and collapse."
+  },
+  "relation_to_cymatics": {
+    "comparison_with_sand": "Sand = dry granular, migrates to NODES. Cornstarch = wet dilatant, accumulates at ANTINODES. The pattern geometry is the same; the phase is inverted — you see the antinodes instead of the nodes.",
+    "comparison_with_water": "Water forms Faraday standing waves (periodic, symmetric). Cornstarch forms discontinuous columns (irregular, organic-looking). The column positions trace the antinode map, but individual columns have stochastic lifetimes.",
+    "sacred_interpretation": "The cornstarch demonstrates that the pattern is in the field, not in the medium. Whether the medium is sand (which avoids vibration) or cornstarch (which clings to vibration), the underlying acoustic geometry is the same — expressed with inverted polarity."
+  },
+  "sources": [
+    "Merkt, F.S. et al. (2004). Persistent holes in a fluid. Physical Review Letters, 92(18), 184501.",
+    "Deegan, R.D. et al. (2004). Wavy and rough cracks in silicon wafers from a wiggling crack tip. Physical Review E, 67, 066209.",
+    "Ebata, H. et al. (2012). Dynamical transition in a dense suspension of cornstarch in water. Physical Review Letters, 109, 014502."
   ]
 }

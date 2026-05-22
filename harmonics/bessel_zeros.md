@@ -1,109 +1,171 @@
-# Bessel Function Zeros: The Eigenfrequency Atlas of the Circular Plate
+# Bessel Function Zeros — Complete Reference for Circular Plate Modes
 
-## What This Is
+## What This Table Is
 
-Every circular Chladni pattern corresponds to a specific **mode (m, n)** where:
-- **m** = number of nodal diameters (lines through the centre where the plate does not move)
-- **n** = number of nodal circles (concentric rings where the plate does not move)
-
-The frequency of mode (m, n) on a free-rimmed circular plate is:
+The modes of a **circular vibrating plate** are eigenfunctions of the form:
 
 ```
-f_mn = (λ_mn² / (2π R²)) · sqrt(D / ρh)
+ψ_{m,n}(r, θ) = J_m(α_{mn} · r/R) · cos(m·θ + φ)
 ```
 
 where:
-- `λ_mn` is the n-th zero of J_m (the Bessel function of the first kind, order m)
-- `R` is the plate radius
-- `D = E·h³ / (12(1 − ν²))` is the flexural rigidity
-- `ρ` is the plate density, `h` is thickness, `ν` is Poisson's ratio
+- `m` = number of nodal **diameters** (angular order)
+- `n` = number of nodal **circles** (radial order, not counting the rim)
+- `α_{mn}` = the *n*-th positive zero of the Bessel function J_m
+- `R` = plate radius
+- `J_m` = Bessel function of the first kind, order m
 
-## Table of Bessel Zeros j_{m,n}
+The nodal lines (where sand or lycopodium collect) are:
+- **Nodal circles**: where `J_m(α_{mn} · r/R) = 0`, at radii `r = R · α_{mk} / α_{mn}` for k < n
+- **Nodal diameters**: where `cos(m·θ + φ) = 0`, i.e. at `θ = (2k+1)·π/(2m)` for k = 0 … 2m−1
 
-These are the zeros of J_m(x): the values of x where J_m(x) = 0.
+---
 
-| n\m | m=0    | m=1    | m=2    | m=3    | m=4    | m=5    | m=6    | m=7    |
-|-----|--------|--------|--------|--------|--------|--------|--------|--------|
-| 1   | 2.4048 | 3.8317 | 5.1356 | 6.3802 | 7.5883 | 8.7715 | 9.9361 | 11.086 |
-| 2   | 5.5201 | 7.0156 | 8.4172 | 9.7610 | 11.065 | 12.339 | 13.589 | 14.821 |
-| 3   | 8.6537 | 10.173 | 11.620 | 13.015 | 14.373 | 15.700 | 17.004 | 18.288 |
-| 4   | 11.792 | 13.324 | 14.796 | 16.223 | 17.616 | 18.980 | 20.321 | 21.642 |
-| 5   | 14.931 | 16.471 | 17.960 | 19.409 | 20.827 | 22.218 | 23.586 | 24.935 |
+## Table of Zeros α_{m,n} (first six radial orders, first eight angular orders)
 
-**Note**: The table above gives zeros of J_m(x). For a **clamped-centre** plate the eigenvalues are the same zeros; for a **free-edge** plate (e.g. a gong) the condition changes and the zeros shift slightly. The values above are the theoretical pure-Bessel zeros, accurate for clamped-centre driving.
+The *n*-th zero of J_m(x), denoted α_{m,n}:
 
-## Relative Frequency Ratios for 432 Hz Base
+| m \ n | n=1      | n=2      | n=3       | n=4       | n=5       | n=6       |
+|--------|----------|----------|-----------|-----------|-----------|-----------|
+| **0**  | 2.40483  | 5.52008  | 8.65373   | 11.79153  | 14.93092  | 18.07106  |
+| **1**  | 3.83171  | 7.01559  | 10.17347  | 13.32369  | 16.47063  | 19.61586  |
+| **2**  | 5.13562  | 8.41724  | 11.61984  | 14.79595  | 17.95982  | 21.11700  |
+| **3**  | 6.38016  | 9.76102  | 13.01520  | 16.22347  | 19.40942  | 22.58273  |
+| **4**  | 7.58834  | 11.06471 | 14.37254  | 17.61597  | 20.82693  | 24.01902  |
+| **5**  | 8.77148  | 12.33860 | 15.70017  | 18.98013  | 22.21769  | 25.43034  |
+| **6**  | 9.93611  | 13.58929 | 17.00382  | 20.32079  | 23.58608  | 26.82015  |
+| **7**  | 11.06371 | 14.82127 | 18.28758  | 21.64154  | 24.93493  | 28.19119  |
 
-For a steel plate tuned so that mode (0,1) plays at 432 Hz, the other modes fall at:
+---
 
-```
-f_mn / f₀₁ = (j_mn / j₀₁)² = (j_mn / 2.4048)²
-```
+## Mode Naming and Sacred Correspondences
 
-| Mode (m,n) | j_mn   | Ratio to (0,1) | Hz at 432 base | Pattern | Sacred |
-|-----------|--------|----------------|----------------|---------|--------|
-| (0,1)     | 2.405  | 1.000          | 432            | Bullseye | Unison |
-| (1,1)     | 3.832  | 2.537          | 1096           | Yin-yang | Duality |
-| (2,1)     | 5.136  | 4.561          | 1970           | Triskelion | Triple spiral |
-| (0,2)     | 5.520  | 5.273          | 2278           | Two rings | Nested circles |
-| (3,1)     | 6.380  | 7.047          | 3044           | Four-leaf | Four directions |
-| (1,2)     | 7.016  | 8.519          | 3680           | Yin-yang + ring | |
-| (4,1)     | 7.588  | 9.952          | 4299           | Pentagram | Phi |
-| (2,2)     | 8.417  | 12.25          | 5292           | Triskelion + ring | |
-| (0,3)     | 8.654  | 12.94          | 5590           | Three rings | Triple world |
-| (5,1)     | 8.772  | 13.29          | 5741           | Hexagram | Merkaba |
-| (3,2)     | 9.761  | 16.47          | 7115           | Four-leaf + ring | |
-| (6,1)     | 9.936  | 17.07          | 7374           | Heptagram | Seven planets |
+| Mode (m,n) | α_{m,n} | Nodal Lines | Visual Form | Sacred Name |
+|------------|---------|-------------|-------------|-------------|
+| (0,1) | 2.4048 | 1 circle | Bullseye | Unison — the whole surface |
+| (1,1) | 3.8317 | 1 diameter, 0 circles | Yin-Yang | Duality, the first cut |
+| (2,1) | 5.1356 | 2 diameters | Triskelion | Triple spiral, 3-fold |
+| (0,2) | 5.5201 | 2 circles | Two rings | Nested wholeness |
+| (3,1) | 6.3802 | 3 diameters | Four-leaf | Four directions (near-square symmetry) |
+| (1,2) | 7.0156 | 1 diam + 1 circle | Cross-ring | Second generation split |
+| (4,1) | 7.5883 | 4 diameters | Pentagram | Five, the golden mode |
+| (2,2) | 8.4172 | 2 diam + 1 circle | Triskelion with ring | Complex spiral |
+| (5,1) | 8.7715 | 5 diameters | Hexagram | Star of David |
+| (0,3) | 8.6537 | 3 circles | Three rings | Three heavens |
+| (6,1) | 9.9361 | 6 diameters | Heptagram | Seven planets (rare) |
+| (3,2) | 9.7610 | 3 diam + 1 circle | Four-leaf with ring | Earth + sky |
+| (4,2) | 11.065 | 4 diam + 1 circle | Pentagram + ring | Golden with inner circle |
+| (7,1) | 11.064 | 7 diameters | Octagram | Eight-fold (Buddhist wheel) |
 
-## The (m,0) Modes — Purely Radial
+---
 
-A special class: modes with no nodal circles (n=0 — note: in some conventions this is n=1 for the first root). These are purely azimuthal:
+## Frequency Formula for a Circular Plate
 
-- (0,0): No nodes — uniform displacement (rigid-body mode, zero frequency)
-- (1,0): Single nodal diameter — the "yin-yang"
-
-In general, the mode with m nodal diameters and no nodal circles has the simplest possible pattern.
-
-## Asymptotic Formula for Large j_{m,n}
-
-For large zeros (high modes), the Bessel zeros approach:
-
-```
-j_mn ≈ π · (n + m/2 − 1/4)    for large n
-```
-
-This means the frequency spacing between adjacent modes *increases* with mode number — the plate's spectrum is not harmonic. This is why Chladni plates do not sing with a harmonic tone. A circular drum tones "dirty" — its overtones are inharmonic.
-
-Compare with a string: f_n = n · f₁ (perfectly harmonic). The drum's inharmonicity is why percussion instruments in most musical traditions are not tuned to harmonic intervals.
-
-## The Bessel Function Itself
-
-J_m(x) is the solution to Bessel's differential equation:
+For a uniform circular plate of radius R, thickness h, density ρ, Young's modulus E, Poisson's ratio ν:
 
 ```
-x² y'' + x y' + (x² − m²) y = 0
+f_{m,n} = (α_{mn}² · h) / (4π · R² · √(ρ/D))
+
+where D = E·h³ / (12·(1-ν²))   [flexural rigidity]
 ```
 
-This equation appears when solving the wave equation (∇²u = ü) in cylindrical or spherical coordinates. The Bessel function is to cylindrical geometry what sine/cosine is to Cartesian geometry.
+Simplified for thin steel plate (E=200 GPa, ρ=7850 kg/m³, ν=0.3):
 
-Key properties:
-- J_m(0) = 0 for m ≥ 1 (the origin has no displacement for m ≥ 1)
-- J_0(0) = 1 (the origin is an antinode for the axisymmetric mode)
-- J_m(x) oscillates with slowly decreasing amplitude as x → ∞ (unlike sin/cos which are undamped)
-- The zeros of J_m are all real, simple, and positive
+```
+f_{m,n} ≈ α_{mn}² · (0.0232 · h / R²)   [Hz, h and R in metres]
+```
 
-## Computing Bessel Zeros
+**Example**: 300 mm diameter steel plate, 1 mm thick:
+- R = 0.150 m, h = 0.001 m
+- f_{0,1} ≈ (2.4048)² · (0.0232 · 0.001 / 0.150²) ≈ **18.5 Hz**
 
-Quick calculation methods:
-1. **McMahon's expansion** (high accuracy for large zeros): `j_mn ≈ β − (4m²−1)/(8β) − 4(4m²−1)(28m²−31)/(3(8β)³) + ...` where `β = (n + m/2 − 1/4)π`
-2. **Halley's method** starting from McMahon's estimate: converges in 2–3 iterations
-3. **Table lookup**: for m ≤ 7, n ≤ 5, the table above is sufficient
+To scale the fundamental to 432 Hz (one octave of 216 Hz), use h ≈ 3.5 mm or R ≈ 35 mm.
 
-In GLSL, we use the asymptotic approximation `J_m(x) ≈ sqrt(2/πx)·cos(x − mπ/2 − π/4)` which is accurate to within 1% for x > 3 and sufficient for visual rendering of nodal patterns.
+---
 
-## References
+## Mode Degeneracy and Symmetry Breaking
 
-- Abramowitz, M. & Stegun, I.A. (1964). *Handbook of Mathematical Functions*, Chapter 9. NIST.
-- Rayleigh, Lord (1877). *The Theory of Sound*, Vol. II, Chapter XII. Macmillan.
-- McLachlan, N.W. (1955). *Bessel Functions for Engineers*. Oxford University Press.
-- Watson, G.N. (1922). *A Treatise on the Theory of Bessel Functions*. Cambridge University Press.
+When two modes have the same frequency (degenerate), the sand pattern can form any linear combination of the two eigenfunctions. The orientation of the nodal lines is set by:
+
+1. **Drive point location**: Driving on a nodal line of one mode excites only the degenerate partner
+2. **Plate asymmetry**: Real plates have slight imperfections that lift degeneracy and fix orientation
+3. **Damping**: Heavier damping at one edge can rotate the nodal pattern
+
+This is why physically identical Chladni plates driven at the same frequency often show slightly different patterns: the degeneracy is broken differently each time.
+
+---
+
+## The Special Significance of Bessel Zeros
+
+The Bessel zeros encode a spectrum of sacred proportions:
+
+| Ratio | Value | Correspondence |
+|-------|-------|---------------|
+| α_{2,1} / α_{0,1} | 5.136 / 2.405 = **2.136** | Close to √(4.57) |
+| α_{4,1} / α_{0,1} | 7.588 / 2.405 = **3.155** | Close to π |
+| α_{3,1} / α_{1,1} | 6.380 / 3.832 = **1.664** | Close to √(e) |
+| α_{5,1} / α_{1,1} | 8.772 / 3.832 = **2.289** | Near 7:3 harmonic |
+| α_{6,1} / α_{2,1} | 9.936 / 5.136 = **1.934** | Near 2:1 octave |
+
+The circular plate's frequency spectrum is **inharmonic** — the overtones are not integer multiples of the fundamental. This is what gives bells and bowls their distinctive shimmering quality. The slight inharmonicity means overtones beat against each other, creating the slow amplitude envelope we perceive as the "ring."
+
+---
+
+## Computing Bessel Zeros Numerically
+
+```python
+from scipy.special import jn_zeros
+import numpy as np
+
+# jn_zeros(m, n) returns first n zeros of J_m
+for m in range(7):
+    zeros = jn_zeros(m, 6)
+    print(f"J_{m}: {np.round(zeros, 5)}")
+```
+
+See `examples/bessel_modes.py` for a complete plate eigenvalue solver.
+
+---
+
+*Every zero of J_m is a silence inscribed in the wave equation. Between the silences, the plate sings.*
+
+---
+
+## Relative Frequency Ratios (432 Hz Base Tuning)
+
+For a plate tuned so that mode (0,1) plays at 432 Hz, other modes fall at:
+
+```
+f_{mn} / f_{0,1} = (α_{mn} / α_{0,1})²  =  (α_{mn} / 2.4048)²
+```
+
+| Mode (m,n) | α_{mn} | Ratio to (0,1) | Hz at 432 base | Pattern |
+|-----------|--------|----------------|----------------|---------|
+| (0,1) | 2.405 | 1.000 | 432 | Bullseye |
+| (1,1) | 3.832 | 2.537 | 1096 | Yin-yang |
+| (2,1) | 5.136 | 4.561 | 1970 | Triskelion |
+| (0,2) | 5.520 | 5.273 | 2278 | Two rings |
+| (3,1) | 6.380 | 7.047 | 3044 | Four-leaf |
+| (1,2) | 7.016 | 8.519 | 3680 | Yin-yang + ring |
+| (4,1) | 7.588 | 9.952 | 4299 | Pentagram |
+| (2,2) | 8.417 | 12.25 | 5292 | Triskelion + ring |
+| (0,3) | 8.654 | 12.94 | 5590 | Three rings |
+| (5,1) | 8.772 | 13.29 | 5741 | Hexagram |
+| (3,2) | 9.761 | 16.47 | 7115 | Four-leaf + ring |
+| (6,1) | 9.936 | 17.07 | 7374 | Heptagram |
+
+The plate's spectrum is **inharmonic** — overtones are not integer multiples of the fundamental.
+This inharmonicity (vs. a string's perfectly harmonic series) gives bells and bowls their shimmer.
+
+## McMahon's Asymptotic Expansion
+
+For large zeros, a fast approximation (accurate to <0.01% for n ≥ 3):
+
+```
+α_{m,n} ≈ β − (4m²−1)/(8β) − 4(4m²−1)(28m²−31)/(3(8β)³) + …
+where β = π·(n + m/2 − 1/4)
+```
+
+In GLSL shaders, the asymptote `J_m(x) ≈ √(2/πx) · cos(x − mπ/2 − π/4)` is used for
+`x > 3` (accurate to within 1% — sufficient for visual nodal patterns).
+

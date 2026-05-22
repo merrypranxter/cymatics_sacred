@@ -1,0 +1,92 @@
+{
+  "name": "Chladni Circular Plate — Free Edge, 432 Hz",
+  "shape": "circular",
+  "diameter_mm": 300,
+  "thickness_mm": 1.2,
+  "material": {
+    "name": "brass_70_30",
+    "density_kg_m3": 8530,
+    "youngs_modulus_GPa": 100,
+    "poisson_ratio": 0.34,
+    "speed_of_sound_m_s": 3430,
+    "damping_factor_eta": 0.002
+  },
+  "boundary": "free_edge",
+  "drive_point": "rim_tangential",
+  "drive_method": "bow_at_rim",
+  "fundamental_hz": 432,
+  "comparison_clamped_center": {
+    "note": "Free-edge circular plates produce fundamentally different mode shapes than clamped-center plates. The lowest modes have nodal diameters but NO nodal circles — the entire disc flexes, with the rim free to displace. This is the mode family of cymbals, gongs, and bells.",
+    "frequency_ratio": "Free-edge fundamental is approximately 2.5× lower than clamped-center at same dimensions"
+  },
+  "modes": [
+    {
+      "m": 2, "n": 0,
+      "freq_hz": 432,
+      "name": "Quadrupole",
+      "description": "Two nodal diameters, no nodal circles. The fundamental free-edge mode.",
+      "sacred": "The four-petal form — the first crack in the cosmos",
+      "antinodes": 4,
+      "notes": "The rim oscillates in a quadrupole pattern: two antinodes pointing up, two pointing down, alternating at 90° intervals. This is the exact mode of a wine glass at its singing frequency."
+    },
+    {
+      "m": 3, "n": 0,
+      "freq_hz": 820,
+      "name": "Triskelion",
+      "description": "Three nodal diameters, no circles.",
+      "sacred": "Six-fold: three crests, three troughs, the hexagonal origin",
+      "antinodes": 6
+    },
+    {
+      "m": 2, "n": 1,
+      "freq_hz": 1048,
+      "name": "Quadrupole with inner ring",
+      "description": "Two diameters + one inner nodal circle",
+      "sacred": "The cross within the wheel",
+      "antinodes": 8
+    },
+    {
+      "m": 4, "n": 0,
+      "freq_hz": 1380,
+      "name": "Octupole",
+      "description": "Four nodal diameters, no circles.",
+      "sacred": "Eight-fold — Buddhist wheel, the octagram",
+      "antinodes": 8
+    },
+    {
+      "m": 5, "n": 0,
+      "freq_hz": 2050,
+      "name": "Decapole",
+      "description": "Five nodal diameters — the pentagram family",
+      "sacred": "Ten-fold: the Pythagorean dekad, the completion of number",
+      "antinodes": 10
+    },
+    {
+      "m": 3, "n": 1,
+      "freq_hz": 2260,
+      "name": "Hexagram with ring",
+      "description": "Three diameters + inner circle",
+      "sacred": "Star of David enclosed in the wheel",
+      "antinodes": 12
+    }
+  ],
+  "rim_driving": {
+    "technique": "Touch the plate at one point on the rim (this becomes a node). Bow the rim at 90°/m from the touch point.",
+    "for_m2_mode": "Touch at 0°, bow at 45°",
+    "for_m3_mode": "Touch at 0°, bow at 30°",
+    "for_m4_mode": "Touch at 0°, bow at 22.5°",
+    "optimal_bow_speed_mm_s": "300–600",
+    "optimal_rosin": "Use quality violin rosin on a cello or bass bow. The slower bow speed relative to violin gives better coupling to the plate's low-frequency modes."
+  },
+  "medium": {
+    "primary": "sand",
+    "alternative": "lycopodium",
+    "depth_effect": "Thicker sand layer (>2 grain diameters) can damp higher modes. Use minimum coverage for cleanest patterns."
+  },
+  "acoustic_properties": {
+    "radiation_efficiency": "Free-edge plates are efficient radiators — the rim motion couples well to air. Clamped-center plates are poor radiators (the nodes hold the rim still).",
+    "decay_time_s": 3.2,
+    "fundamental_wavelength_in_plate_m": 0.21
+  },
+  "notes": "This is the plate geometry of the Tibetan singing bowl (though the bowl is hemispherical rather than flat). The free-edge boundary condition allows the rim to be driven like a bell — struck or continuously bowed. The free-edge modes are also the modes of the cymbals used in orchestral percussion and Buddhist ritual."
+}
